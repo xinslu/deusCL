@@ -1,3 +1,4 @@
+mod repl;
 fn main() {
-    println!("Hello, world!");
+    repl::main();
 }

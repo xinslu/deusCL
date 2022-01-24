@@ -1,4 +1,4 @@
-# Introduction
+\# Introduction
 
 My choice for building the REPL for this project would be Rust. Now, I do admit this choice is baised, I wanted to get into learning rust because I hope to expand myself into WASM and Systems Engineering among many other things and rust was my choice over C++ other its obvious unneeded complexity and annoying errors.  This document will summarie what I find about rust and a way to summarize all that I think about it.
 
@@ -33,5 +33,11 @@ fn main() {
 ```
 Instead of copying the values from the s1 pointer and allocating more memory in the heap to store s2, which to say the least would be computationally expensive and slow, rust instead transfer ownership from s1 onto s2, which essentially means the pointer store is moved onto s2 and s1 is invalidated. This is essentially a form of shallow copy but since s1 is also invalidated, rust calls this a "move". A deep copy can be created if wanted but for heap stored variables its never explicit. On Stack-Only datatypes, this is implicit since they have a Copy trait.
 
+# Borrowing
+There is a hidden problem in ownership, passing a variable of heap-memory into a fucntion would always invalidate it since the paramater would take up its value, which would automatically would be invalidated after the function block. So for each heap-memory type variable we would have to return the variable in the function to preserve the value. This is solved by borrowing, which essentially means passing the reference of the variable instead of the transferring the ownership. However, like normal variables references are immutable and must be declared to be mutable throught &mut. Mutable references have one big restriction: you can have only one mutable reference to a particular piece of data at a time. This applied to having different mutable and immutable references too. To summarize the rules:
+* There should be only eithr one mutable reference or any number of immutable references.
+* References should always be made from a variable that is valid.
+
+There is also another type of Refrence that is called slice reference that makes use of the range operator. The slice reference ensure that the data it is dependent on is not deferenced or deallocated. This ensures memory safety in Rust.
 
 
