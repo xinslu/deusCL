@@ -41,6 +41,7 @@ dependencies = [
 name = "code"
 version = "0.1.0"
 dependencies = [
+ "log",
  "rustyline",
 ]
 

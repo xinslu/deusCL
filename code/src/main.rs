@@ -1,4 +1,6 @@
 mod repl;
+mod tokenizer;
+mod types;
 fn main() {
-    repl::main();
+    repl::repl();
 }

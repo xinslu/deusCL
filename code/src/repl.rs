@@ -1,29 +1,29 @@
+use crate::tokenizer::tokenizer::tokenize;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
-
-pub fn main() {
-    // `()` can be used when no completer is required
+use log;
+pub fn repl() {
     let mut rl = Editor::<()>::new();
     if rl.load_history("history.txt").is_err() {
         println!("No previous history.");
     }
     loop {
-        let readline = rl.readline("Deus> ");
+        let readline = rl.readline("DEUS-USER> ");
         match readline {
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
-                println!("Line: {}", line);
+                println!("OUT: {:?}", tokenize(line));
             },
             Err(ReadlineError::Interrupted) => {
-                println!("CTRL-C");
+                log::info!("Bye!!");
                 break
             },
             Err(ReadlineError::Eof) => {
-                println!("CTRL-D");
+                log::info!("CTRL-D");
                 break
             },
             Err(err) => {
-                println!("Error: {:?}", err);
+                log::warn!("Error: {:?}", err);
                 break
             }
         }
