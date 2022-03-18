@@ -53,7 +53,11 @@ With Structs, you can attach implementation to it essentially treating it like a
 
 # Crates and Packages
 
-A Binary in Rust is called a crate. Crate root is the root file which the rustc compiler builds up all the way and makes up the root module of the crate. A package is one or more crates and contains a Cargo.toml. Use the mod keyword to declare a module and use to use a module in other. You can use the pub keyword to make any module or function available from outside the module. Enums and Structs can also be defined as public. The use keyword is use to bring nmodules into the namespace. To bring all the modules defined use the glob operator. If you split your modules in different files, then you need to declared the mod name followed by semicolon in the crate root.
+A Binary in Rust is called a crate. Crate root is the root file which the rustc compiler builds up all the way and makes up the root module of the crate. A package is one or more crates and contains a Cargo.toml. Use the mod keyword to declare a module and use to use a module in others. You can use the pub keyword to make any module or function available from outside the module. Enums and Structs can also be defined as public. The use keyword is used to bring modules into the namespace. To bring all the modules defined use the glob operator. If you split your modules in different files, then you need to declare the mod name followed by semicolon in the crate root.
+
+# Traits
+
+In Rust, interfaces are called traits. You can implement traits for enums or structs or pretty much anything else. The traits can have default implementations if you want to as well which is just defined as putting the body of the functions in the trait function. Traits can be used to narrow down function parameters too, parameters can be made to take in only a type which implements a trait using the &impl operator. Using the where operator also helps in simplifying the traits used for a parameter. However, when return types that implement a trait, there can be only one type return there cannot be a conditional that switched between types to return.
 
 
 

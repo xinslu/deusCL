@@ -1,6 +1,7 @@
-use crate::tokenizer::tokenizer::tokenize;
+use crate::tokenizer::Tokenizer;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
+// use crate::parser::parser;
 use log;
 pub fn repl() {
     let mut rl = Editor::<()>::new();
@@ -9,10 +10,12 @@ pub fn repl() {
     }
     loop {
         let readline = rl.readline("DEUS-USER> ");
+        let mut tokenizer = Tokenizer::create();
         match readline {
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
-                println!("OUT: {:?}", tokenize(line));
+                let _result = tokenizer.tokenize(line);
+                tokenizer.print_tokens();
             },
             Err(ReadlineError::Interrupted) => {
                 log::info!("Bye!!");

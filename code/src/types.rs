@@ -1,21 +1,25 @@
 use std::collections::HashMap;
-pub type Result<T> = std::result::Result<T, Errors>;
-pub type DeusResult = Result<Box<Token>>;
 
+
+
+pub use crate::token:: {
+    Token
+};
 pub enum TokenFunction {
     Builtin(),
     Lambda(),
 }
 
 
-pub enum Token {
+pub enum TokenTypes {
     Fun(TokenFunction),
-    Number(i64),
-    Symbol(String),
-    StringLiteral(String)
+    Number,
+    Symbol,
+    StringLiteral,
+    List,
 }
 
-
+#[derive(Debug)]
 pub enum Errors {
     FunctionFormat,
     NotANumber,
@@ -27,4 +31,9 @@ pub enum Errors {
     DivisionByZero,
 }
 
+
+
+struct Environment {
+  data: HashMap<String, Token>,
+}
 
