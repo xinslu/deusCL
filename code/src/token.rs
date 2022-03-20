@@ -11,7 +11,7 @@ pub struct Token {
 
 impl std::fmt::Debug for Token {
     fn fmt(&self, _: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        println!("{}",self.lexeme);
+        print!("{} {:?}",self.lexeme, self._type);
         Ok(())
     }
 }

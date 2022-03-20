@@ -27,11 +27,29 @@ impl Tokenizer{
 
     pub fn tokenize(&mut self, expr: String) -> &Vec<String> {
         self.line = expr.replace("(", " ( ").replace(")", " ) ").split_whitespace().map(|x| x.to_string()).collect();
-        for _item in self.line.iter() {
-            if Tokenizer::is_digit(_item.to_string()) {
-                let text: String = self.line[self.current as usize].clone();
-                println!("{:?}", self.line);
-                self.tokens.push(Token {_type: TokenTypes::Number, lexeme: text});
+        println!("{:?}", self.line);
+        while !self.is_at_end() {
+            let text: String = self.advance().to_string();
+            match &text[..] {
+                "+" => self.tokens.push(Token {_type: TokenTypes::PLUS, lexeme: text}),
+                "-" => self.tokens.push(Token {_type: TokenTypes::MINUS, lexeme: text}),
+                "*" => self.tokens.push(Token {_type: TokenTypes::STAR, lexeme: text}),
+                "/" => self.tokens.push(Token {_type: TokenTypes::SLASH, lexeme: text}),
+                "/=" => self.tokens.push(Token {_type: TokenTypes::SLASHEQUAL, lexeme: text}),
+                "=" => self.tokens.push(Token {_type: TokenTypes::EQUAL, lexeme: text}),
+                ">" => self.tokens.push(Token {_type: TokenTypes::GREATER, lexeme: text}),
+                "<" => self.tokens.push(Token {_type: TokenTypes::LESS, lexeme: text}),
+                ">=" => self.tokens.push(Token {_type: TokenTypes::GreaterEqual, lexeme: text}),
+                "<=" => self.tokens.push(Token {_type: TokenTypes::LessEqual, lexeme: text}),
+                "(" => self.tokens.push(Token {_type: TokenTypes::LeftParen, lexeme: text}),
+                ")" => self.tokens.push(Token {_type: TokenTypes::RightParen, lexeme: text}),
+                _ => {
+                    if Tokenizer::is_digit(text.to_string()) {
+                        self.tokens.push(Token {_type: TokenTypes::Number, lexeme: text});
+                    } else {
+                        println!("Something wrong {}", text);
+                    }
+                }
             }
         }
         return &self.line;
@@ -44,8 +62,11 @@ impl Tokenizer{
 
 
     pub fn advance(&mut self) -> &String {
-        self.current += 1;
-        return &self.line[self.current as usize]
+        if self.current < self.line.len() as i32 {
+            self.current += 1;
+            return &self.line[(self.current-1) as usize]
+        }
+        return &self.line[(self.line.len() - 1) as usize]
     }
 
     pub fn r#match(&mut self, expected: String) -> bool {
@@ -81,7 +102,6 @@ impl Tokenizer{
         let text: String = self.line[self.current as usize].clone();
         self.tokens.push(Token {_type: token_type, lexeme: text})
     }
-
 
     pub fn is_digit(number: String) -> bool {
         for character in number.chars() {

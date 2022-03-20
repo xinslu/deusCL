@@ -5,16 +5,30 @@ use std::collections::HashMap;
 pub use crate::token:: {
     Token
 };
+
+#[derive(Debug)]
 pub enum TokenFunction {
     Builtin(),
     Lambda(),
 }
 
-
+#[derive(Debug)]
 pub enum TokenTypes {
     Fun(TokenFunction),
     Number,
     Symbol,
+    LeftParen,
+    RightParen,
+    MINUS,
+    PLUS,
+    SLASH,
+    SLASHEQUAL,
+    STAR,
+    EQUAL,
+    GREATER,
+    GreaterEqual,
+    LESS,
+    LessEqual,
     StringLiteral,
     List,
 }
