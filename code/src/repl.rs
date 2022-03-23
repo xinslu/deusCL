@@ -1,8 +1,15 @@
 use crate::tokenizer::Tokenizer;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
-// use crate::parser::parser;
+use crate::parser::Parser;
 use log;
+use crate::interpreter::{
+    Interpreter
+};
+use crate::visitors::{
+    Visitor
+};
+
 pub fn repl() {
     let mut rl = Editor::<()>::new();
     if rl.load_history("history.txt").is_err() {
@@ -16,6 +23,11 @@ pub fn repl() {
                 rl.add_history_entry(line.as_str());
                 let _result = tokenizer.tokenize(line);
                 tokenizer.print_tokens();
+                let mut _parser = Parser::create(tokenizer.tokens);
+                let _parseresult = _parser.parse();
+                let mut _interpreter = Interpreter {};
+                _interpreter.visit_logical(_parseresult.unwrap()[0].clone());
+                // _interpreter.bruh();
             },
             Err(ReadlineError::Interrupted) => {
                 log::info!("Bye!!");

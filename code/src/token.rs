@@ -3,7 +3,7 @@ use core::fmt::Formatter;
 use crate::types::{
     TokenTypes
 };
-
+#[derive(Clone)]
 pub struct Token {
     pub _type: TokenTypes,
     pub lexeme: String

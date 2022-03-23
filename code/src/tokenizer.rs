@@ -6,7 +6,7 @@ pub use crate::token:: {
 };
 pub struct Tokenizer {
     line: Vec<String>,
-    tokens:Vec<Token>,
+    pub tokens:Vec<Token>,
     current: i32,
     start: i32,
 }

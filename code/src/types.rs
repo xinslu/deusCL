@@ -6,13 +6,13 @@ pub use crate::token:: {
     Token
 };
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Copy)]
 pub enum TokenFunction {
     Builtin(),
     Lambda(),
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Copy)]
 pub enum TokenTypes {
     Fun(TokenFunction),
     Number,
