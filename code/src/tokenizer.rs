@@ -27,7 +27,7 @@ impl Tokenizer{
 
     pub fn tokenize(&mut self, expr: String) -> &Vec<String> {
         self.line = expr.replace("(", " ( ").replace(")", " ) ").split_whitespace().map(|x| x.to_string()).collect();
-        println!("{:?}", self.line);
+        // println!("{:?}", self.line);
         while !self.is_at_end() {
             let text: String = self.advance().to_string();
             match &text[..] {
@@ -43,11 +43,13 @@ impl Tokenizer{
                 "<=" => self.tokens.push(Token {_type: TokenTypes::LessEqual, lexeme: text}),
                 "(" => self.tokens.push(Token {_type: TokenTypes::LeftParen, lexeme: text}),
                 ")" => self.tokens.push(Token {_type: TokenTypes::RightParen, lexeme: text}),
+                "max" => self.tokens.push(Token {_type: TokenTypes::MAX, lexeme: text}),
+                "min" => self.tokens.push(Token {_type: TokenTypes::MIN, lexeme: text}),
                 _ => {
                     if Tokenizer::is_digit(text.to_string()) {
                         self.tokens.push(Token {_type: TokenTypes::Number, lexeme: text});
                     } else {
-                        println!("Something wrong {}", text);
+                        panic!("Something wrong {}", text);
                     }
                 }
             }
@@ -103,7 +105,10 @@ impl Tokenizer{
         self.tokens.push(Token {_type: token_type, lexeme: text})
     }
 
-    pub fn is_digit(number: String) -> bool {
+    pub fn is_digit(mut number: String) -> bool {
+        if number.chars().nth(0).unwrap() == '-' {
+            number = number[1..].to_string();
+        }
         for character in number.chars() {
             if !character.is_ascii_digit() {
                 return false;

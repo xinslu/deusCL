@@ -20,10 +20,12 @@ pub fn repl() {
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
                 let _result = tokenizer.tokenize(line);
+                // println!("created parser");
                 // tokenizer.print_tokens();
+                // println!("right after print");
                 let mut _parser = Parser::create(tokenizer.tokens);
                 let _parseresult = _parser.parse();
-                // print!("{:?}", _parseresult);
+                // println!("{:?}", _parseresult);
                 let mut _interpreter = Interpreter {};
                 _interpreter.accept(_parseresult.unwrap()[0].clone());
             },

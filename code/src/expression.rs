@@ -1,10 +1,9 @@
+#[allow(unused_imports)]
 use crate::token::{
     Token
 };
 
-use crate::visitors::{
-    Visitor
-};
+
 
 #[derive(Clone, Debug)]
 pub enum Expression {

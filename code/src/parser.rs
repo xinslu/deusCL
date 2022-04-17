@@ -19,51 +19,54 @@ impl Parser{
         }
     }
     pub fn parse(&mut self) -> Result<Vec<Expression>, Errors> {
+        self.current+=1;
         let expr = self.equality();
         return Ok(vec![expr]);
     }
 
-    pub fn equality(&mut self) -> Expression{
-        self.current+=1;
+    pub fn equality(&mut self) -> Expression {
+        // print!("in equality");
         match self.token_list[self.current as usize]._type {
             TokenTypes::EQUAL => {
-                let mut literals: Vec<Expression> = Vec::new();
-                let operator = self.token_list[self.current as usize].clone();
-                self.current+=1;
-                while self.r#match(TokenTypes::Number) {
-                    literals.push(Expression::Literal {token: self.peek_before().clone()})
-                }
-                Expression::Logical {operator: operator, expr: literals}
+                return self.return_logical();
             },
             TokenTypes::SLASHEQUAL => {
-                let mut literals: Vec<Expression> = Vec::new();
-                let operator = self.token_list[self.current as usize].clone();
-                self.current+=1;
-                while self.r#match(TokenTypes::Number) {
-                    literals.push(Expression::Literal {token: self.peek_before().clone()})
-                }
-                Expression::Logical {operator: operator, expr: literals}
+                return self.return_logical();
             },
             TokenTypes::GREATER => {
-                let mut literals: Vec<Expression> = Vec::new();
-                let operator = self.token_list[self.current as usize].clone();
-                self.current+=1;
-                while self.r#match(TokenTypes::Number) {
-                    literals.push(Expression::Literal {token: self.peek_before().clone()})
-                }
-                Expression::Logical {operator: operator, expr: literals}
+                return self.return_logical();
             },
             TokenTypes::LESS => {
-                let mut literals: Vec<Expression> = Vec::new();
-                let operator = self.token_list[self.current as usize].clone();
-                self.current+=1;
-                while self.r#match(TokenTypes::Number) {
-                    literals.push(Expression::Literal {token: self.peek_before().clone()})
-                }
-                Expression::Logical {operator: operator, expr: literals}
-            }
+                return self.return_logical();
+            },
+            TokenTypes::GreaterEqual => {
+                return self.return_logical();
+            },
+            TokenTypes::LessEqual => {
+                return self.return_logical();
+            },
+            TokenTypes::MAX => {
+                // print!("here bruh");
+                return self.return_arithmetic();
+            },
+            TokenTypes::MIN => {
+                // print!("here bruh");
+                return self.return_arithmetic();
+            },
+            TokenTypes::PLUS => {
+                return self.return_arithmetic();
+            },
+            TokenTypes::MINUS => {
+                return self.return_arithmetic();
+            },
+            TokenTypes::STAR => {
+                return self.return_arithmetic();
+            },
+            TokenTypes::SLASH => {
+                return self.return_arithmetic();
+            },
             _ => {
-                panic!("Brung Error");
+                panic!("Not a Valid Operator");
             }
         }
     }
@@ -71,6 +74,33 @@ impl Parser{
     // pub fn return_slice(&mut self) {
 
     // }
+
+    pub fn return_logical(&mut self) -> Expression {
+        let mut literals: Vec<Expression> = Vec::new();
+        let operator = self.token_list[self.current as usize].clone();
+        self.current+=1;
+        while self.r#match(TokenTypes::Number) {
+            literals.push(Expression::Literal {token: self.peek_before().clone()})
+        }
+        Expression::Logical {operator: operator, expr: literals}
+    }
+
+    pub fn return_arithmetic(&mut self) -> Expression {
+        let mut arith: Vec<Expression> = Vec::new();
+        let operator = self.token_list[self.current as usize].clone();
+        self.current+=1;
+        loop {
+            if self.r#match(TokenTypes::RightParen) || self.is_at_end() {
+                break;
+            }
+            if self.r#match(TokenTypes::LeftParen) {
+                arith.push(self.equality());
+            } else if self.r#match(TokenTypes::Number){
+                arith.push(Expression::Literal {token: self.peek_before().clone()});
+            }
+        }
+        Expression::Arithmetic {operator: operator, expr: arith}
+    }
 
     pub fn check(&mut self, toktype: TokenTypes) -> bool{
         if self.is_at_end() {
