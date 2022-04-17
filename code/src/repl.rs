@@ -6,9 +6,7 @@ use log;
 use crate::interpreter::{
     Interpreter
 };
-use crate::visitors::{
-    Visitor
-};
+
 
 pub fn repl() {
     let mut rl = Editor::<()>::new();
@@ -22,12 +20,12 @@ pub fn repl() {
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
                 let _result = tokenizer.tokenize(line);
-                tokenizer.print_tokens();
+                // tokenizer.print_tokens();
                 let mut _parser = Parser::create(tokenizer.tokens);
                 let _parseresult = _parser.parse();
+                // print!("{:?}", _parseresult);
                 let mut _interpreter = Interpreter {};
-                _interpreter.visit_logical(_parseresult.unwrap()[0].clone());
-                // _interpreter.bruh();
+                _interpreter.accept(_parseresult.unwrap()[0].clone());
             },
             Err(ReadlineError::Interrupted) => {
                 log::info!("Bye!!");

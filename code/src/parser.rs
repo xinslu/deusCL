@@ -27,18 +27,50 @@ impl Parser{
         self.current+=1;
         match self.token_list[self.current as usize]._type {
             TokenTypes::EQUAL => {
-                println!("Here in Parser Equal");
-                Expression::Logical {operator: self.token_list[self.current as usize].clone(), Expr: vec![Expression::Literal {token: self.token_list[(self.current+1) as usize].clone()}, Expression::Literal {token: self.token_list[(self.current+2) as usize].clone()}]}
+                let mut literals: Vec<Expression> = Vec::new();
+                let operator = self.token_list[self.current as usize].clone();
+                self.current+=1;
+                while self.r#match(TokenTypes::Number) {
+                    literals.push(Expression::Literal {token: self.peek_before().clone()})
+                }
+                Expression::Logical {operator: operator, expr: literals}
             },
+            TokenTypes::SLASHEQUAL => {
+                let mut literals: Vec<Expression> = Vec::new();
+                let operator = self.token_list[self.current as usize].clone();
+                self.current+=1;
+                while self.r#match(TokenTypes::Number) {
+                    literals.push(Expression::Literal {token: self.peek_before().clone()})
+                }
+                Expression::Logical {operator: operator, expr: literals}
+            },
+            TokenTypes::GREATER => {
+                let mut literals: Vec<Expression> = Vec::new();
+                let operator = self.token_list[self.current as usize].clone();
+                self.current+=1;
+                while self.r#match(TokenTypes::Number) {
+                    literals.push(Expression::Literal {token: self.peek_before().clone()})
+                }
+                Expression::Logical {operator: operator, expr: literals}
+            },
+            TokenTypes::LESS => {
+                let mut literals: Vec<Expression> = Vec::new();
+                let operator = self.token_list[self.current as usize].clone();
+                self.current+=1;
+                while self.r#match(TokenTypes::Number) {
+                    literals.push(Expression::Literal {token: self.peek_before().clone()})
+                }
+                Expression::Logical {operator: operator, expr: literals}
+            }
             _ => {
                 panic!("Brung Error");
             }
         }
     }
 
-    pub fn return_slice(&mut self) {
+    // pub fn return_slice(&mut self) {
 
-    }
+    // }
 
     pub fn check(&mut self, toktype: TokenTypes) -> bool{
         if self.is_at_end() {
@@ -56,7 +88,7 @@ impl Parser{
     pub fn r#match(&mut self, expected: TokenTypes) -> bool {
         if self.is_at_end() {
             return false;
-        } else if self.check(expected) {
+        } else if self.check(expected) == false {
             return false;
         }
         self.current += 1;
@@ -65,6 +97,10 @@ impl Parser{
 
     pub fn peek(&mut self) -> &Token {
         return &self.token_list[self.current as usize];
+    }
+
+    pub fn peek_before(&mut self) -> &Token {
+        return &self.token_list[(self.current - 1) as usize];
     }
 
 

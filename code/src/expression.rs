@@ -1,24 +1,30 @@
 use crate::token::{
     Token
 };
+
+use crate::visitors::{
+    Visitor
+};
+
 #[derive(Clone, Debug)]
 pub enum Expression {
         Assignment {
-                name: Token,
-                Expr: Box<Expression>
+            name: Token,
+            expr: Box<Expression>
         }, Literal {
-                token: Token,
+            token: Token,
         }, Logical {
-                operator: Token,
-                Expr: Vec<Expression>
+            operator: Token,
+            expr: Vec<Expression>
         }, Grouping {
-                Expr: Box<Expression>
+            expr: Box<Expression>
         }, Variable {
-                name: Token
+            name: Token
         }, Arithmetic {
-                operator: Token,
-                Expr: Vec<Expression>
+            operator: Token,
+            expr: Vec<Expression>
         }
 }
+
 
 
