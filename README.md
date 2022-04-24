@@ -11,6 +11,15 @@ This readme and the project is general is living right now until maybe I decide 
 1. Rust
 2. Cargo
 
+Installing Rust and Cargo on Linux and macOS you can do the following:
+
+```
+curl https://sh.rustup.rs -sSf | sh
+```
+
+Installing on Windows you can just use this link https://static.rust-lang.org/rustup/dist/i686-pc-windows-gnu/rustup-init.exe.
+
+
 # Running the REPL
 
 You can run the REPL, doing the following in a terminal:
