@@ -9,9 +9,6 @@ use crate::visitors::{
 };
 use std::cmp;
 
-
-
-
 pub struct Interpreter;
 impl Interpreter {
     pub fn accept(&mut self, expression: Expression ) {
@@ -23,7 +20,7 @@ impl Interpreter {
                 println!("{:?}", self.visit_arithmetic(expression));
             },
             _ => {
-                println!("panic mode");
+                println!("Unsupported Operation Right Now");
             }
         }
     }
@@ -106,6 +103,85 @@ impl Visitor for Interpreter {
                         }
                         return _rolling_bool;
                     },
+                    TokenTypes::AND => {
+                        let mut _rolling_bool = true;
+                        for i in &expr {
+                            match &i {
+                                Expression::Literal {token} => {
+                                    match token._type {
+                                        TokenTypes::NIL => {
+                                            return false;
+                                        },
+                                        _ => {
+                                            let result = self.visit_literal(i);
+                                            if result == 0 {
+                                                _rolling_bool = _rolling_bool && 1 != 0;
+                                            }
+                                            _rolling_bool = _rolling_bool && (result != 0)
+                                        }
+                                    }
+                                },
+                                Expression::Logical { operator: _, expr: _ } => {
+                                    _rolling_bool = _rolling_bool && self.visit_logical(i.clone());
+                                },
+                                _ => {
+                                    self.visit_literal(i);
+                                }
+                            }
+                        }
+                        return _rolling_bool;
+                    },
+                    TokenTypes::OR => {
+                        let mut _rolling_bool = false;
+                        for i in &expr {
+                            match &i {
+                                Expression::Literal {token} => {
+                                    match token._type {
+                                        TokenTypes::NIL => {
+                                            _rolling_bool = _rolling_bool || false;
+                                        },
+                                        _ => {
+                                            _rolling_bool = _rolling_bool || true;
+                                        }
+                                    }
+                                },
+                                Expression::Logical { operator: _, expr: _ } => {
+                                    _rolling_bool = _rolling_bool || self.visit_logical(i.clone());
+                                },
+                                _ => {
+                                    self.visit_literal(i);
+                                }
+                            }
+                        }
+                        return _rolling_bool;
+                    },
+                    TokenTypes::NOT => {
+                        if expr.len() > 1 {
+                            panic!("Cannot Have more than 1 Arguement");
+                        }
+                        match &expr[0] {
+                            Expression::Literal {token} => {
+                                    match token._type {
+                                        TokenTypes::NIL => {
+                                            return true;
+                                        },
+                                        _ => {
+                                            let result = self.visit_literal(&expr[0]);
+                                            if result == 0 {
+                                                return false;
+                                            }
+                                            return !(result != 0)
+                                        }
+                                    }
+                                },
+                                Expression::Logical { operator: _, expr: _ } => {
+                                    return !self.visit_logical(expr[0].clone());
+                                },
+                                _ => {
+                                    return true
+                                }
+                        }
+                    }
                     _ => {
                         panic!("Unsupported Operator!");
                     }

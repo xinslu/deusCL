@@ -33,6 +33,10 @@ pub enum TokenTypes {
     MIN,
     StringLiteral,
     List,
+    AND,
+    OR,
+    NOT,
+    NIL
 }
 
 #[derive(Debug)]

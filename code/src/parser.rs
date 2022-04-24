@@ -46,11 +46,9 @@ impl Parser{
                 return self.return_logical();
             },
             TokenTypes::MAX => {
-                // print!("here bruh");
                 return self.return_arithmetic();
             },
             TokenTypes::MIN => {
-                // print!("here bruh");
                 return self.return_arithmetic();
             },
             TokenTypes::PLUS => {
@@ -65,6 +63,15 @@ impl Parser{
             TokenTypes::SLASH => {
                 return self.return_arithmetic();
             },
+            TokenTypes::AND => {
+                return self.return_logical();
+            },
+            TokenTypes::OR => {
+                return self.return_logical();
+            },
+            TokenTypes::NOT => {
+                return self.return_logical();
+            }
             _ => {
                 panic!("Not a Valid Operator");
             }
@@ -79,8 +86,15 @@ impl Parser{
         let mut literals: Vec<Expression> = Vec::new();
         let operator = self.token_list[self.current as usize].clone();
         self.current+=1;
-        while self.r#match(TokenTypes::Number) {
-            literals.push(Expression::Literal {token: self.peek_before().clone()})
+        loop {
+            if self.r#match(TokenTypes::RightParen) || self.is_at_end() {
+                break;
+            }
+            if self.r#match(TokenTypes::LeftParen) {
+                literals.push(self.equality());
+            } else if self.r#match(TokenTypes::Number)  || self.r#match(TokenTypes::NIL) {
+                literals.push(Expression::Literal {token: self.peek_before().clone()});
+            }
         }
         Expression::Logical {operator: operator, expr: literals}
     }
