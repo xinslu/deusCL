@@ -6,5 +6,16 @@ I am starting this project as a complete beginner to Lisp, Interpreters/REPL and
 
 This readme and the project is general is living right now until maybe I decide to give up on it, but until then I will keep working on it. All the readmes within this project are living and I will keep on updating them as I summarize my findings and results.
 
+# Requirements
 
+1. Rust
+2. Cargo
 
+# Running the REPL
+
+You can run the REPL, doing the following in a terminal:
+```
+git clone https://github.com/xinslu/deusCL.git
+cd deusCL/code
+cargo run
+```

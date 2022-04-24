@@ -78,10 +78,6 @@ impl Parser{
         }
     }
 
-    // pub fn return_slice(&mut self) {
-
-    // }
-
     pub fn return_logical(&mut self) -> Expression {
         let mut literals: Vec<Expression> = Vec::new();
         let operator = self.token_list[self.current as usize].clone();
