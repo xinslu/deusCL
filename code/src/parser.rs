@@ -71,9 +71,15 @@ impl Parser{
             },
             TokenTypes::NOT => {
                 return self.return_logical();
-            }
+            },
+            TokenTypes::MOD => {
+                return self.return_arithmetic();
+            },
+            TokenTypes::LET => {
+                return self.variable_declaration();
+            },
             _ => {
-                panic!("Not a Valid Operator");
+                panic!("Not a Valid Operator {:?}", self.token_list[self.current as usize]._type);
             }
         }
     }
@@ -95,6 +101,7 @@ impl Parser{
         Expression::Logical {operator: operator, expr: literals}
     }
 
+
     pub fn return_arithmetic(&mut self) -> Expression {
         let mut arith: Vec<Expression> = Vec::new();
         let operator = self.token_list[self.current as usize].clone();
@@ -110,6 +117,32 @@ impl Parser{
             }
         }
         Expression::Arithmetic {operator: operator, expr: arith}
+    }
+
+
+    pub fn variable_declaration(&mut self) -> Expression {
+        self.current+=1;
+        self.r#match(TokenTypes::LeftParen);
+        self.r#match(TokenTypes::LeftParen);
+        loop {
+            if self.is_at_end() {
+                break;
+            }
+            if self.r#match(TokenTypes::RightParen) {
+                self.current+=1;
+            }
+            if self.r#match(TokenTypes::IDENTIFIER) {
+                let name = Box::new(Expression::Variable {name: self.peek_before().clone()});
+                let expr;
+                if self.r#match(TokenTypes::LeftParen) {
+                    expr = Box::new(self.equality());
+                } else {
+                    expr = Box::new(Expression::Literal {token: self.peek().clone()});
+                }
+                return Expression::Assignment {name , expr}
+            }
+        }
+        panic!("Illegal Assignment {:?}", self.peek());
     }
 
     pub fn check(&mut self, toktype: TokenTypes) -> bool{

@@ -6,7 +6,7 @@ use log;
 use crate::interpreter::{
     Interpreter
 };
-
+use std::panic;
 
 pub fn repl() {
     let mut rl = Editor::<()>::new();
@@ -19,7 +19,7 @@ pub fn repl() {
         match readline {
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
-                let _result = tokenizer.tokenize(line);
+                let _result =  tokenizer.tokenize(line);
                 // println!("created parser");
                 // tokenizer.print_tokens();
                 // println!("right after print");

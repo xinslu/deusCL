@@ -16,7 +16,7 @@ pub enum TokenFunction {
 pub enum TokenTypes {
     Fun(TokenFunction),
     Number,
-    Symbol,
+    IDENTIFIER,
     LeftParen,
     RightParen,
     MINUS,
@@ -36,7 +36,9 @@ pub enum TokenTypes {
     AND,
     OR,
     NOT,
-    NIL
+    NIL,
+    MOD,
+    LET
 }
 
 #[derive(Debug)]

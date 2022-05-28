@@ -8,7 +8,7 @@ use crate::token::{
 #[derive(Clone, Debug)]
 pub enum Expression {
         Assignment {
-            name: Token,
+            name: Box<Expression>,
             expr: Box<Expression>
         }, Literal {
             token: Token,

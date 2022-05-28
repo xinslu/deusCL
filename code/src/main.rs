@@ -1,4 +1,6 @@
-#[allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(non_snake_case)]
 mod repl;
 mod tokenizer;
 mod types;
@@ -7,6 +9,7 @@ mod token;
 mod expression;
 mod visitors;
 mod interpreter;
+mod environment;
 fn main() {
     repl::repl();
 }

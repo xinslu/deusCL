@@ -43,16 +43,20 @@ impl Tokenizer{
                 "<=" => self.tokens.push(Token {_type: TokenTypes::LessEqual, lexeme: text}),
                 "(" => self.tokens.push(Token {_type: TokenTypes::LeftParen, lexeme: text}),
                 ")" => self.tokens.push(Token {_type: TokenTypes::RightParen, lexeme: text}),
+                "%" => self.tokens.push(Token {_type: TokenTypes::MOD, lexeme: text}),
                 "max" => self.tokens.push(Token {_type: TokenTypes::MAX, lexeme: text}),
                 "min" => self.tokens.push(Token {_type: TokenTypes::MIN, lexeme: text}),
                 "and" => self.tokens.push(Token {_type: TokenTypes::AND, lexeme: text}),
                 "or" => self.tokens.push(Token {_type: TokenTypes::OR, lexeme: text}),
                 "not" => self.tokens.push(Token {_type: TokenTypes::NOT, lexeme: text}),
                 "nil" => self.tokens.push(Token {_type: TokenTypes::NIL, lexeme: text}),
+                "let" => self.tokens.push(Token {_type: TokenTypes::LET, lexeme: text}),
                 "NIL" => self.tokens.push(Token {_type: TokenTypes::NIL, lexeme: text}),
                 _ => {
                     if Tokenizer::is_digit(text.to_string()) {
                         self.tokens.push(Token {_type: TokenTypes::Number, lexeme: text});
+                    } else if text.chars().all(char::is_alphanumeric) {
+                        self.tokens.push(Token {_type: TokenTypes::IDENTIFIER, lexeme: text});
                     } else {
                         panic!("Something wrong with {}", text);
                     }
