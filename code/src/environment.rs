@@ -22,20 +22,51 @@ impl Environment {
     }
 
 
-    pub fn get(&mut self, name: String) -> Box<dyn Display + '_> {
+    pub fn get(&self, name: String) -> Box<dyn Display + '_> {
         match self.map.get(&name) {
             Some(value) => return Box::new(value),
             None => {
-                match *self.enclosing {
-                    Some(_) => {
-                        return (*self.enclosing).as_ref().unwrap().get(name);
+                match &*self.enclosing {
+                    Some(enclosing) => {
+                        return enclosing.get(name);
                     },
                     None => {
                         panic!("Variable not Defined")
                     }
                 }
+            }
+        }
+    }
+
+    pub fn assign<T: 'static>(&mut self, name: String, value: T) where T:  Display {
+        if let Some(newValue) = self.map.get_mut(&name) {
+                *newValue = Box::new(value);
+        } else {
+            match &mut *self.enclosing {
+                Some(enclosing) => {
+                    enclosing.assign(name, value);
+                },
+                None => {
+                    panic!("Variable not Defined")
                 }
             }
-
+        }
     }
+
+    pub fn ancestor(&mut self, distance : i32) -> &Environment {
+        let mut environment = &*self;
+        for _i in 0..distance {
+            match &*environment.enclosing{
+                Some(enclosing) => {
+                    environment = &enclosing
+                },
+                _ => {
+                    return environment;
+                }
+            }
+        }
+        return environment
+    }
+
+
 }
