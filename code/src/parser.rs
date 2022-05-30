@@ -158,6 +158,7 @@ impl Parser{
             if body && !self.r#match(TokenTypes::RightParen){
                 self.r#match(TokenTypes::LeftParen);
                 bodyVec.push(self.equality());
+                self.current += 1;
             }
         }
         Expression::Local {

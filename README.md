@@ -28,3 +28,7 @@ git clone https://github.com/xinslu/deusCL.git
 cd deusCL/code
 cargo run
 ```
+
+# Images
+
+![Arithmetic Stuff](images/arithmetic?raw=true "Arithmetic Operations in DeusCL")
