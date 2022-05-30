@@ -31,4 +31,14 @@ cargo run
 
 # Images
 
-![Arithmetic Stuff](./Images/arithmetic.png "Arithmetic Operations in DeusCL")
+## Arithmetic Operations in DeusCL
+
+![Arithmetic Operation](./Images/arithmetic.png "Arithmetic Operations in DeusCL")
+
+## Logical Operations in DeusCL
+
+![Logical Operation](./Images/logical.png "Logical Operations in DeusCL")
+
+## Local Variable Creation and usage in DeusCL
+
+![Local Variables](./Images/variable.png "Local Variables in DeusCL")
