@@ -12,9 +12,22 @@ use crate::environment::{
     Environment
 };
 use std::cmp;
+use std::collections::HashMap;
+use std::fmt::Display;
 
-pub struct Interpreter;
+pub struct Interpreter {
+    globals: Environment,
+    environment: Environment,
+    locals: HashMap<String, Box<dyn Display + 'static>>
+}
 impl Interpreter {
+    pub fn new() -> Interpreter {
+        Interpreter {
+            globals: Environment::new(None),
+            environment: Environment::new(None),
+            locals: HashMap::new()
+        }
+    }
     pub fn accept(&mut self, expression: Expression ) {
         match expression {
             Expression::Logical {operator: _, expr: _} => {
@@ -23,6 +36,9 @@ impl Interpreter {
             Expression::Arithmetic { operator: _, expr: _ } => {
                 println!("{:?}", self.visit_arithmetic(expression));
             },
+            Expression::Local {declarations: _} => {
+                println!("{:?}", self.visit_local(expression));
+            }
             _ => {
                 println!("Unsupported Operation Right Now");
             }
@@ -70,7 +86,7 @@ impl Interpreter {
         return rBool;
     }
 
-    pub fn artihmetic_lambda(&mut self, expr: Vec<Expression>, func: &dyn Fn(i64, i64) -> i64) -> i64  {
+    pub fn artihmetic_lambda(&self, expr: Vec<Expression>, func: &dyn Fn(i64, i64) -> i64) -> i64  {
         let mut temp = self.visit_literal(&expr[0]);
         for i in &expr[1..] {
             temp = func(temp, self.visit_literal(i));
@@ -154,7 +170,7 @@ impl Visitor for Interpreter {
         }
     }
 
-    fn visit_literal(&mut self, lit: &Expression) -> i64 {
+    fn visit_literal(&self, lit: &Expression) -> i64 {
         match &lit {
             Expression::Literal {token} => {
                 match token._type {
@@ -175,7 +191,7 @@ impl Visitor for Interpreter {
         }
     }
 
-    fn visit_arithmetic(&mut self, arith: Expression) -> i64 {
+    fn visit_arithmetic(&self, arith: Expression) -> i64 {
         let add = |a, b| a + b;
         let minus = |a, b| a - b;
         let multiply = |a, b| a * b;
@@ -217,5 +233,31 @@ impl Visitor for Interpreter {
         }
     }
 
+    fn visit_local(&mut self, local: Expression) {
+        match local {
+            Expression::Local{declarations} => {
+                for i in declarations {
+                    match i {
+                        Expression::Assignment { name, expr } => {
+                            match *name {
+                                Expression::Variable { name } => {
+                                    self.locals.insert(name.lexeme, Box::new(self.visit_literal(&*expr)));
+                                },
+                                _ => {
+                                    panic!("bruh");
+                                }
+                            }
+                        },
+                        _ => {
+                            panic!("Bruh");
+                        }
+                    }
+                }
+            },
+            _ => {
+                panic!("Bruh");
+            }
+        }
+    }
 }
 

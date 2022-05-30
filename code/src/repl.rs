@@ -26,7 +26,7 @@ pub fn repl() {
                 let mut _parser = Parser::create(tokenizer.tokens);
                 let _parseresult = _parser.parse();
                 // println!("{:?}", _parseresult);
-                let mut _interpreter = Interpreter {};
+                let mut _interpreter = Interpreter::new();
                 _interpreter.accept(_parseresult.unwrap()[0].clone());
             },
             Err(ReadlineError::Interrupted) => {

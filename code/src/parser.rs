@@ -76,7 +76,7 @@ impl Parser{
                 return self.return_arithmetic();
             },
             TokenTypes::LET => {
-                return self.variable_declaration();
+                return self.local_declaration();
             },
             _ => {
                 panic!("Not a Valid Operator {:?}", self.token_list[self.current as usize]._type);
@@ -120,18 +120,27 @@ impl Parser{
     }
 
 
-    pub fn variable_declaration(&mut self) -> Expression {
+    pub fn local_declaration(&mut self) -> Expression {
+        let mut local: Vec<Expression> = Vec::new();
+        let mut body = false;
         self.current+=1;
         self.r#match(TokenTypes::LeftParen);
         self.r#match(TokenTypes::LeftParen);
+        let mut closeCount = 0;
         loop {
             if self.is_at_end() {
                 break;
             }
             if self.r#match(TokenTypes::RightParen) {
                 self.current+=1;
+                closeCount += 1
             }
-            if self.r#match(TokenTypes::IDENTIFIER) {
+
+            if closeCount == 2 {
+                body = true
+            }
+
+            if self.r#match(TokenTypes::IDENTIFIER)  && !body{
                 let name = Box::new(Expression::Variable {name: self.peek_before().clone()});
                 let expr;
                 if self.r#match(TokenTypes::LeftParen) {
@@ -139,10 +148,13 @@ impl Parser{
                 } else {
                     expr = Box::new(Expression::Literal {token: self.peek().clone()});
                 }
-                return Expression::Assignment {name , expr}
+                local.push(Expression::Assignment {name , expr});
+                self.current+=1;
             }
         }
-        panic!("Illegal Assignment {:?}", self.peek());
+        Expression::Local {
+            declarations: local
+        }
     }
 
     pub fn check(&mut self, toktype: TokenTypes) -> bool{

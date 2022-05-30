@@ -68,5 +68,28 @@ impl Environment {
         return environment
     }
 
+    pub fn getAt(&mut self, name: String, distance : i32) -> Box<dyn Display + '_> {
+        if let Some(value) = self.ancestor(distance).map.get(&name) {
+            return Box::new(value);
+        } else {
+            panic!("Variable Not Found!");
+        }
+    }
+
+
+    pub fn assignAt<T: 'static>(&mut self, name: String, value: T, distance : i32) where T:  Display {
+        let mut environment = &mut *self;
+        for _i in 0..distance {
+            match &mut *environment.enclosing{
+                Some(enclosing) => {
+                    environment = &mut *enclosing
+                },
+                _ => {
+                    panic!("Wrong Distance");
+                }
+            }
+        }
+        environment.assign(name,value);
+    }
 
 }

@@ -22,6 +22,9 @@ pub enum Expression {
         }, Arithmetic {
             operator: Token,
             expr: Vec<Expression>
+        }, Local {
+            declarations: Vec<Expression>,
+            // body: Box<Expression>
         }
 }
 
