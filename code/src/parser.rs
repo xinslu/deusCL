@@ -114,6 +114,8 @@ impl Parser{
                 arith.push(self.equality());
             } else if self.r#match(TokenTypes::Number){
                 arith.push(Expression::Literal {token: self.peek_before().clone()});
+            } else if self.r#match(TokenTypes::IDENTIFIER){
+                arith.push(Expression::Variable {name: self.peek_before().clone()});
             }
         }
         Expression::Arithmetic {operator: operator, expr: arith}
@@ -122,21 +124,22 @@ impl Parser{
 
     pub fn local_declaration(&mut self) -> Expression {
         let mut local: Vec<Expression> = Vec::new();
+        let mut bodyVec: Vec<Expression> = Vec::new();
         let mut body = false;
         self.current+=1;
         self.r#match(TokenTypes::LeftParen);
         self.r#match(TokenTypes::LeftParen);
         let mut closeCount = 0;
         loop {
-            if self.is_at_end() {
-                break;
-            }
-            if self.r#match(TokenTypes::RightParen) {
+            if self.r#match(TokenTypes::RightParen) || self.r#match(TokenTypes::LeftParen) {
                 self.current+=1;
                 closeCount += 1
             }
+            if self.is_at_end() {
+                break;
+            }
 
-            if closeCount == 2 {
+            if closeCount >= 2 {
                 body = true
             }
 
@@ -151,9 +154,15 @@ impl Parser{
                 local.push(Expression::Assignment {name , expr});
                 self.current+=1;
             }
+
+            if body && !self.r#match(TokenTypes::RightParen){
+                self.r#match(TokenTypes::LeftParen);
+                bodyVec.push(self.equality());
+            }
         }
         Expression::Local {
-            declarations: local
+            declarations: local,
+            body: bodyVec
         }
     }
 

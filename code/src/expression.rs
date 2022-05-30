@@ -24,7 +24,7 @@ pub enum Expression {
             expr: Vec<Expression>
         }, Local {
             declarations: Vec<Expression>,
-            // body: Box<Expression>
+            body: Vec<Expression>
         }
 }
 

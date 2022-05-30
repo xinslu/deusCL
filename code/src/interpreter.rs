@@ -18,7 +18,7 @@ use std::fmt::Display;
 pub struct Interpreter {
     globals: Environment,
     environment: Environment,
-    locals: HashMap<String, Box<dyn Display + 'static>>
+    locals: HashMap<String, i64>
 }
 impl Interpreter {
     pub fn new() -> Interpreter {
@@ -36,8 +36,8 @@ impl Interpreter {
             Expression::Arithmetic { operator: _, expr: _ } => {
                 println!("{:?}", self.visit_arithmetic(expression));
             },
-            Expression::Local {declarations: _} => {
-                println!("{:?}", self.visit_local(expression));
+            Expression::Local {declarations: _, body: _} => {
+                self.visit_local(expression);
             }
             _ => {
                 println!("Unsupported Operation Right Now");
@@ -185,6 +185,12 @@ impl Visitor for Interpreter {
             Expression::Arithmetic { operator: _, expr: _ } => {
                 return self.visit_arithmetic(lit.clone());
             },
+            Expression::Variable { name } => {
+                if let Some(value) = self.locals.get(&name.lexeme) {
+                    return *value;
+                }
+                panic!("Not a valid Variable")
+            }
             _ => {
                 panic!("Not a Literal!");
             }
@@ -235,13 +241,13 @@ impl Visitor for Interpreter {
 
     fn visit_local(&mut self, local: Expression) {
         match local {
-            Expression::Local{declarations} => {
+            Expression::Local{declarations, body} => {
                 for i in declarations {
                     match i {
                         Expression::Assignment { name, expr } => {
                             match *name {
                                 Expression::Variable { name } => {
-                                    self.locals.insert(name.lexeme, Box::new(self.visit_literal(&*expr)));
+                                    self.locals.insert(name.lexeme, self.visit_literal(&*expr));
                                 },
                                 _ => {
                                     panic!("bruh");
@@ -252,6 +258,13 @@ impl Visitor for Interpreter {
                             panic!("Bruh");
                         }
                     }
+                }
+
+                for j in body {
+                    self.accept(j);
+                }
+                for (key, value) in &self.locals {
+                    println!("{} => {}", key, value);
                 }
             },
             _ => {
