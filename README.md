@@ -31,4 +31,4 @@ cargo run
 
 # Images
 
-![Arithmetic Stuff](images/arithmetic?raw=true "Arithmetic Operations in DeusCL")
+![Arithmetic Stuff](Images/arithmetic "Arithmetic Operations in DeusCL")
