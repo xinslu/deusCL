@@ -78,6 +78,9 @@ impl Parser{
             TokenTypes::LET => {
                 return self.local_declaration();
             },
+            TokenTypes::SET => {
+                return self.set_declaration();
+            }
             _ => {
                 panic!("Not a Valid Operator {:?}", self.token_list[self.current as usize]._type);
             }
@@ -164,6 +167,48 @@ impl Parser{
         Expression::Local {
             declarations: local,
             body: bodyVec
+        }
+    }
+
+
+    pub fn set_declaration(&mut self) -> Expression {
+        println!("Here");
+        let mut local: Vec<Expression> = Vec::new();
+        self.current+=1;
+        let mut _open = 1;
+        loop {
+            if self.r#match(TokenTypes::LeftParen) {
+                self.current+=1;
+                _open += 1
+            }
+
+            if self.r#match(TokenTypes::RightParen) {
+                self.current+=1;
+                _open -= 1;
+            }
+
+            if _open == 0 {
+                break;
+            }
+
+            if self.is_at_end() {
+                break;
+            }
+
+            if self.r#match(TokenTypes::IDENTIFIER){
+                let name = Box::new(Expression::Variable {name: self.peek_before().clone()});
+                let expr;
+                if self.r#match(TokenTypes::LeftParen) {
+                    expr = Box::new(self.equality());
+                } else {
+                    expr = Box::new(Expression::Literal {token: self.peek().clone()});
+                }
+                local.push(Expression::Assignment {name , expr});
+                self.current+=1;
+            }
+        }
+        Expression::Set {
+            declarations: local
         }
     }
 

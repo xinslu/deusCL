@@ -38,7 +38,8 @@ pub enum TokenTypes {
     NOT,
     NIL,
     MOD,
-    LET
+    LET,
+    SET
 }
 
 #[derive(Debug)]

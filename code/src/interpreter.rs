@@ -266,9 +266,20 @@ impl Visitor for Interpreter {
                 for (key, value) in &self.locals {
                     println!("{} => {}", key, value);
                 }
+                self.locals = HashMap::new()
             },
             _ => {
                 panic!("Bruh");
+            }
+        }
+    }
+
+    fn visit_set(&mut self, set: Expression) {
+        match set {
+            Expression::Set { declarations } => {
+                println!("Here: {:?}", declarations);
+            },  _ => {
+                panic!("Invalid Assignment")
             }
         }
     }

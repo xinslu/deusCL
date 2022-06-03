@@ -25,6 +25,8 @@ pub enum Expression {
         }, Local {
             declarations: Vec<Expression>,
             body: Vec<Expression>
+        }, Set {
+            declarations: Vec<Expression>
         }
 }
 
