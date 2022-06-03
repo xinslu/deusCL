@@ -41,9 +41,39 @@ impl Interpreter {
             },
             Expression::Set {declarations: _} => {
                 self.visit_set(expression);
-            }
+            },
+            Expression::Print { print: _ } => {
+                self.visit_print(expression);
+            },
             _ => {
                 println!("Unsupported Operation Right Now");
+            }
+        }
+    }
+
+    pub fn process(&mut self, expression: Expression ) -> Box<dyn Display + 'static> {
+        match expression {
+            Expression::Logical {operator: _, expr: _} => {
+                Box::new(self.visit_logical(expression))
+            },
+            Expression::Arithmetic { operator: _, expr: _ } => {
+                Box::new(self.visit_arithmetic(expression))
+            },
+            Expression::Local {declarations: _, body: _} => {
+                self.visit_local(expression);
+                Box::new("")
+            },
+            Expression::Set {declarations: _} => {
+                self.visit_set(expression);
+                Box::new("")
+            },
+            Expression::Print { print: _ } => {
+                self.visit_print(expression);
+                Box::new("")
+            },
+            _ => {
+                println!("Unsupported Operation Right Now");
+                Box::new("")
             }
         }
     }
@@ -264,7 +294,7 @@ impl Visitor for Interpreter {
                 }
 
                 for j in body {
-                    self.accept(j);
+                    self.process(j);
                 }
                 for (key, value) in &self.locals {
                     println!("{} => {}", key, value);
@@ -299,6 +329,18 @@ impl Visitor for Interpreter {
                 }
             },  _ => {
                 panic!("Invalid Assignment")
+            }
+        }
+    }
+
+
+    fn visit_print(&mut self, print: Expression) {
+        match print {
+            Expression::Print { print } => {
+                println!("{}", self.process(*print));
+            },
+            _ => {
+                panic!("Illegal Operation");
             }
         }
     }

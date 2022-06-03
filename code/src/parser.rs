@@ -80,6 +80,9 @@ impl Parser{
             },
             TokenTypes::SET => {
                 return self.set_declaration();
+            },
+            TokenTypes::PRINT => {
+                return self.print_declration();
             }
             _ => {
                 panic!("Not a Valid Operator {:?}", self.token_list[self.current as usize]._type);
@@ -209,6 +212,20 @@ impl Parser{
         }
         Expression::Set {
             declarations: local
+        }
+    }
+
+    pub fn print_declration(&mut self) -> Expression {
+        self.current+=1;
+        let expr;
+        if self.r#match(TokenTypes::LeftParen) {
+            expr = Box::new(self.equality());
+        } else {
+            expr = Box::new(Expression::Literal {token: self.peek().clone()});
+            self.current+=1;
+        }
+        Expression::Print {
+            print: expr
         }
     }
 

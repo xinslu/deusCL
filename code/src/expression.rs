@@ -27,6 +27,8 @@ pub enum Expression {
             body: Vec<Expression>
         }, Set {
             declarations: Vec<Expression>
+        }, Print {
+            print: Box<Expression>
         }
 }
 
