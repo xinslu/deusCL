@@ -38,6 +38,9 @@ impl Interpreter {
             },
             Expression::Local {declarations: _, body: _} => {
                 self.visit_local(expression);
+            },
+            Expression::Set {declarations: _} => {
+                self.visit_set(expression);
             }
             _ => {
                 println!("Unsupported Operation Right Now");
@@ -277,7 +280,23 @@ impl Visitor for Interpreter {
     fn visit_set(&mut self, set: Expression) {
         match set {
             Expression::Set { declarations } => {
-                println!("Here: {:?}", declarations);
+                for i in declarations {
+                    match i {
+                        Expression::Assignment { name, expr } => {
+                            match *name {
+                                Expression::Variable { name } => {
+                                    self.locals.insert(name.lexeme, self.visit_literal(&*expr));
+                                },
+                                _ => {
+                                    panic!("bruh");
+                                }
+                            }
+                        },
+                        _ => {
+                            panic!("Bruh");
+                        }
+                    }
+                }
             },  _ => {
                 panic!("Invalid Assignment")
             }

@@ -172,22 +172,22 @@ impl Parser{
 
 
     pub fn set_declaration(&mut self) -> Expression {
-        println!("Here");
         let mut local: Vec<Expression> = Vec::new();
         self.current+=1;
-        let mut _open = 1;
+        let mut open = 1;
         loop {
             if self.r#match(TokenTypes::LeftParen) {
                 self.current+=1;
-                _open += 1
+                open += 1
             }
 
             if self.r#match(TokenTypes::RightParen) {
                 self.current+=1;
-                _open -= 1;
+                open -= 1;
             }
 
-            if _open == 0 {
+            if open <= 0 {
+                self.current-=1;
                 break;
             }
 
@@ -202,9 +202,9 @@ impl Parser{
                     expr = Box::new(self.equality());
                 } else {
                     expr = Box::new(Expression::Literal {token: self.peek().clone()});
+                    self.current+=1;
                 }
                 local.push(Expression::Assignment {name , expr});
-                self.current+=1;
             }
         }
         Expression::Set {
