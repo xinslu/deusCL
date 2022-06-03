@@ -83,6 +83,9 @@ impl Parser{
             },
             TokenTypes::PRINT => {
                 return self.print_declration();
+            },
+            TokenTypes::IDENTIFIER => {
+                return self.variable()
             }
             _ => {
                 panic!("Not a Valid Operator {:?}", self.token_list[self.current as usize]._type);
@@ -220,6 +223,9 @@ impl Parser{
         let expr;
         if self.r#match(TokenTypes::LeftParen) {
             expr = Box::new(self.equality());
+        } else if self.r#match(TokenTypes::IDENTIFIER) {
+            self.current-=1;
+            expr = Box::new(self.equality());
         } else {
             expr = Box::new(Expression::Literal {token: self.peek().clone()});
             self.current+=1;
@@ -227,6 +233,12 @@ impl Parser{
         Expression::Print {
             print: expr
         }
+    }
+
+    pub fn variable(&mut self) -> Expression {
+        let ret = Expression::Variable {name: self.peek().clone()};
+        self.current+=2;
+        return ret;
     }
 
     pub fn check(&mut self, toktype: TokenTypes) -> bool{

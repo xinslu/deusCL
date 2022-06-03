@@ -45,6 +45,9 @@ impl Interpreter {
             Expression::Print { print: _ } => {
                 self.visit_print(expression);
             },
+            Expression::Literal { token: _ } => {
+                self.visit_literal(&expression);
+            }
             _ => {
                 println!("Unsupported Operation Right Now");
             }
@@ -71,6 +74,9 @@ impl Interpreter {
                 self.visit_print(expression);
                 Box::new("")
             },
+            Expression::Variable { name: _ } => {
+                Box::new(self.visit_literal(&expression))
+            }
             _ => {
                 println!("Unsupported Operation Right Now");
                 Box::new("")
