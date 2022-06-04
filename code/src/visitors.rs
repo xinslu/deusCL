@@ -13,4 +13,5 @@ pub trait Visitor {
     fn visit_if(&mut self, ifBlock: Expression);
     fn visit_string(&mut self, string: Expression) -> String;
     fn visit_for(&mut self, loopExpr: Expression);
+    fn visit_global(&mut self, global: Expression);
 }

@@ -3,9 +3,7 @@ use rustyline::error::ReadlineError;
 use rustyline::Editor;
 use crate::parser::Parser;
 use log;
-use crate::interpreter::{
-    Interpreter
-};
+use crate::interpreter::Interpreter;
 use std::panic;
 
 pub fn repl() {
@@ -29,6 +27,7 @@ pub fn repl() {
                 let _parseresult = _parser.parse();
                 // println!("{:?}", _parseresult);
                 _interpreter.accept(_parseresult.unwrap()[0].clone());
+                _interpreter.clean_env();
             },
             Err(ReadlineError::Interrupted) => {
                 log::info!("Bye!!");

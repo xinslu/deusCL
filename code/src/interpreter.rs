@@ -1,29 +1,16 @@
-use crate::types::{
-    TokenTypes
-};
-use crate::expression::{
-    Expression
-};
-use crate::visitors::{
-    Visitor
-};
+use crate::{expression::Expression, types::TokenTypes, environment::Environment, visitors::Visitor};
 
-use crate::environment::{
-    Environment
-};
 use std::cmp;
 use std::collections::HashMap;
 use std::fmt::Display;
 
 pub struct Interpreter {
-    globals: Environment,
     environment: Environment,
     locals: HashMap<String, i64>
 }
 impl Interpreter {
     pub fn new() -> Interpreter {
         Interpreter {
-            globals: Environment::new(None),
             environment: Environment::new(None),
             locals: HashMap::new()
         }
@@ -46,13 +33,10 @@ impl Interpreter {
                 self.visit_print(expression);
             },
             Expression::Literal { ref token} => {
-                match token._type {
-                    TokenTypes::STRINGLITERAL => {
-                        self.visit_string(expression);
-                    },
-                    _ => {
-                        self.visit_literal(&expression);
-                    }
+                if let TokenTypes::STRINGLITERAL = token._type {
+                    self.visit_string(expression);
+                } else {
+                    self.visit_literal(&expression);
                 }
 
             },
@@ -62,6 +46,9 @@ impl Interpreter {
             Expression::Loop {..} => {
                 self.visit_for(expression);
             },
+            Expression::Global {..} => {
+                self.visit_global(expression);
+            }
             _ => {
                 println!("Unsupported Operation Right Now");
             }
@@ -92,13 +79,10 @@ impl Interpreter {
                 Box::new(self.visit_literal(&expression))
             },
             Expression::Literal { ref token} => {
-                match token._type {
-                    TokenTypes::STRINGLITERAL => {
-                        Box::new(self.visit_string(expression))
-                    },
-                    _ => {
-                        Box::new(self.visit_literal(&expression))
-                    }
+                if let TokenTypes::STRINGLITERAL = token._type {
+                    Box::new(self.visit_string(expression))
+                } else {
+                    Box::new(self.visit_literal(&expression))
                 }
 
             },
@@ -111,6 +95,10 @@ impl Interpreter {
                 Box::new("")
             }
         }
+    }
+
+    pub fn clean_env(&mut self) {
+        self.locals = HashMap::new();
     }
 
     pub fn comparision_lambda(&mut self, expr: Vec<Expression>, func: &dyn Fn(i64, i64) -> bool) -> bool  {
@@ -133,14 +121,11 @@ impl Interpreter {
         for i in &expr {
             match &i {
                 Expression::Literal {token} => {
-                    match token._type {
-                        TokenTypes::NIL => {
-                            return false;
-                        },
-                        _ => {
-                            self.visit_literal(i);
-                            rBool = func(rBool,true);
-                        }
+                    if let TokenTypes::NIL = token._type {
+                        return false;
+                    } else {
+                        self.visit_literal(i);
+                        rBool = func(rBool,true);
                     }
                 },
                 Expression::Logical { operator: _, expr: _ } => {
@@ -206,17 +191,14 @@ impl Visitor for Interpreter {
                         }
                         match &expr[0] {
                             Expression::Literal {token} => {
-                                    match token._type {
-                                        TokenTypes::NIL => {
-                                            return true;
-                                        },
-                                        _ => {
-                                            let result = self.visit_literal(&expr[0]);
-                                            if result == 0 {
-                                                return false;
-                                            }
-                                            return !(result != 0)
+                                    if let TokenTypes::NIL = token._type {
+                                        return true;
+                                    } else {
+                                        let result = self.visit_literal(&expr[0]);
+                                        if result == 0 {
+                                            return false;
                                         }
+                                        return !(result != 0)
                                     }
                                 },
                                 Expression::Logical { operator: _, expr: _ } => {
@@ -241,13 +223,10 @@ impl Visitor for Interpreter {
     fn visit_literal(&self, lit: &Expression) -> i64 {
         match &lit {
             Expression::Literal {token} => {
-                match token._type {
-                    TokenTypes::Number =>{
-                        return token.lexeme.parse().unwrap();
-                    },
-                    _ => {
-                        panic!("Should Be a Number Only!");
-                    }
+                if let TokenTypes::Number = token._type {
+                    return token.lexeme.parse().unwrap();
+                } else {
+                    panic!("Should Be a Number Only!");
                 }
             },
             Expression::Arithmetic { operator: _, expr: _ } => {
@@ -257,7 +236,7 @@ impl Visitor for Interpreter {
                 if let Some(value) = self.locals.get(&name.lexeme) {
                     return *value;
                 }
-                panic!("Not a valid Variable")
+                return *self.environment.get(name.lexeme);
             }
             _ => {
                 panic!("Not a Literal!");
@@ -308,37 +287,27 @@ impl Visitor for Interpreter {
     }
 
     fn visit_local(&mut self, local: Expression) {
-        match local {
-            Expression::Local{declarations, body} => {
-                for i in declarations {
-                    match i {
-                        Expression::Assignment { name, expr } => {
-                            match *name {
-                                Expression::Variable { name } => {
-                                    self.locals.insert(name.lexeme, self.visit_literal(&*expr));
-                                },
-                                _ => {
-                                    panic!("Not a Variable");
-                                }
-                            }
-                        },
-                        _ => {
-                            panic!("Not a Variable");
-                        }
+        if let Expression::Local{declarations, body} = local {
+            for i in declarations {
+                if let Expression::Assignment { name, expr } = i {
+                    if let Expression::Variable { name } = *name {
+                        self.locals.insert(name.lexeme, self.visit_literal(&*expr));
+                    } else {
+                        println!("Not a Variable");
                     }
+                } else {
+                    println!("Not a Variable");
                 }
-
-                for j in body {
-                    self.process(j);
-                }
-                for (key, value) in &self.locals {
-                    println!("{} => {}", key, value);
-                }
-                self.locals = HashMap::new()
-            },
-            _ => {
-                panic!("Bruh");
             }
+
+            for j in body {
+                self.process(j);
+            }
+            for (key, value) in &self.locals {
+                println!("{} => {}", key, value);
+            }
+        } else {
+            panic!("Wrong Type");
         }
     }
 
@@ -348,13 +317,10 @@ impl Visitor for Interpreter {
                 for i in declarations {
                     match i {
                         Expression::Assignment { name, expr } => {
-                            match *name {
-                                Expression::Variable { name } => {
-                                    self.locals.insert(name.lexeme, self.visit_literal(&*expr));
-                                },
-                                _ => {
-                                    panic!("bruh");
-                                }
+                            if let Expression::Variable { name } = *name {
+                                self.locals.insert(name.lexeme, self.visit_literal(&*expr));
+                            } else {
+                                panic!("bruh");
                             }
                         },
                         _ => {
@@ -389,13 +355,8 @@ impl Visitor for Interpreter {
                         if cond == true {
                             self.process(*body);
                         } else {
-                            match then {
-                                Some(thenBody) => {
-                                    self.process(*thenBody);
-                                },
-                                _ => {
-
-                                }
+                            if let Some(thenBody) = then {
+                                self.process(*thenBody);
                             }
                         }
                     },
@@ -413,13 +374,10 @@ impl Visitor for Interpreter {
     fn visit_string(&mut self, string: Expression) -> String{
         match string {
             Expression::Literal{token} => {
-                match token._type {
-                    TokenTypes::STRINGLITERAL => {
-                        return token.lexeme;
-                    },
-                    _ => {
-                        panic!("Not a string");
-                    }
+                if let TokenTypes::STRINGLITERAL = token._type {
+                    return token.lexeme;
+                } else {
+                    panic!("Not a string");
                 }
             }
             _ => {
@@ -447,6 +405,16 @@ impl Visitor for Interpreter {
             _ => {panic!("Not a For Loop")}
         }
 
+    }
+    fn visit_global(&mut self, global: Expression) {
+        if let Expression::Global { name, expr } = global {
+            if let Expression::Variable { name } = *name {
+                let value = self.process(*expr);
+                self.environment.define(name.lexeme, value)
+            }
+        } else {
+            panic!("Not a GLobal Variable declarations");
+        }
     }
 }
 

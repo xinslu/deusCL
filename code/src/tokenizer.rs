@@ -1,9 +1,5 @@
-pub use crate::types::{
-    TokenTypes
-};
-pub use crate::token:: {
-    Token
-};
+pub use crate::types::TokenTypes;
+pub use crate::token:: Token;
 pub struct Tokenizer {
     line: Vec<String>,
     pub tokens:Vec<Token>,
@@ -56,6 +52,7 @@ impl Tokenizer{
                 "print" => self.tokens.push(Token {_type: TokenTypes::PRINT, lexeme: text}),
                 "if" => self.tokens.push(Token {_type: TokenTypes::IF, lexeme: text}),
                 "loop" => self.tokens.push(Token {_type: TokenTypes::LOOP, lexeme: text}),
+                "var" => self.tokens.push(Token {_type: TokenTypes::VAR, lexeme: text}),
                 _ => {
                     if Tokenizer::is_digit(text.to_string()) {
                         self.tokens.push(Token {_type: TokenTypes::Number, lexeme: text});

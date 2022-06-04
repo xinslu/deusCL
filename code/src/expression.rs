@@ -1,7 +1,5 @@
 #[allow(unused_imports)]
-use crate::token::{
-    Token
-};
+use crate::token::Token;
 
 
 
@@ -38,6 +36,9 @@ pub enum Expression {
             start: Box<Expression>,
             end: Box<Expression>,
             body: Vec<Expression>
+        }, Global {
+            name: Box<Expression>,
+            expr: Box<Expression>
         }
 }
 

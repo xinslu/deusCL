@@ -42,7 +42,8 @@ pub enum TokenTypes {
     SET,
     PRINT,
     IF,
-    LOOP
+    LOOP,
+    VAR
 }
 
 #[derive(Debug)]

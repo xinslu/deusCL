@@ -1,10 +1,7 @@
 use crate::token::Token;
-use crate::types::{
+use crate::{types::{
     Errors, TokenTypes
-};
-use crate::expression::{
-    Expression
-};
+}, expression::Expression};
 use std::mem;
 pub struct Parser {
     current: i32,
@@ -94,6 +91,9 @@ impl Parser{
             TokenTypes::LOOP => {
                 return self.loop_declaration()
             },
+            TokenTypes::VAR => {
+                return self.var_declaration()
+            }
             _ => {
                 panic!("Not a Valid Operator {:?}", self.token_list[self.current as usize]._type);
             }
@@ -116,7 +116,7 @@ impl Parser{
                 literals.push(Expression::Variable {name: self.peek_before().clone()});
             }
         }
-        Expression::Logical {operator: operator, expr: literals}
+        Expression::Logical {operator, expr: literals}
     }
 
 
@@ -136,7 +136,7 @@ impl Parser{
                 arith.push(Expression::Variable {name: self.peek_before().clone()});
             }
         }
-        Expression::Arithmetic {operator: operator, expr: arith}
+        Expression::Arithmetic {operator, expr: arith}
     }
 
 
@@ -259,7 +259,7 @@ impl Parser{
         Expression::If {
             condition: Box::new(condition),
             body: Box::new(Body),
-            then: then
+            then
         }
     }
 
@@ -292,11 +292,23 @@ impl Parser{
         }
         Expression::Loop {
             variable: name,
-            start: start,
-            end: end,
+            end,
+            start,
             body: loopVec
         }
+    }
 
+    pub fn var_declaration(&mut self) -> Expression {
+        self.matchPanic(TokenTypes::VAR);
+        let name = Expression::Variable {name: self.matchPanic(TokenTypes::IDENTIFIER)};
+        let expr;
+        if self.r#match(TokenTypes::LeftParen) {
+            expr = Box::new(self.equality());
+        } else {
+            expr = Box::new(Expression::Literal {token: self.peek().clone()});
+            self.current+=1;
+        }
+        Expression::Global { name: Box::new(name), expr}
     }
 
     pub fn check(&mut self, toktype: TokenTypes) -> bool{
