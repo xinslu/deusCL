@@ -1,3 +1,6 @@
+use code::main as repl;
+
 fn main() {
-    println!("Hello, world!");
+    repl();
 }
+
