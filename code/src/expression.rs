@@ -33,6 +33,11 @@ pub enum Expression {
             condition: Box<Expression>,
             body: Box<Expression>,
             then: Option<Box<Expression>>
+        }, Loop {
+            variable: Box<Expression>,
+            start: Box<Expression>,
+            end: Box<Expression>,
+            body: Vec<Expression>
         }
 }
 

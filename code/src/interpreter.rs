@@ -59,6 +59,9 @@ impl Interpreter {
             Expression::If {condition: _, body: _, then: _} => {
                 self.visit_if(expression);
             },
+            Expression::Loop {..} => {
+                self.visit_for(expression);
+            },
             _ => {
                 println!("Unsupported Operation Right Now");
             }
@@ -423,6 +426,27 @@ impl Visitor for Interpreter {
                 panic!("Not a String");
             }
         }
+    }
+    fn visit_for(&mut self, loopExpr: Expression) {
+        match loopExpr {
+            Expression::Loop {variable, start, end, body} => {
+                match *variable {
+                    Expression::Variable {name} => {
+                        let startInt = self.visit_literal(&*start);
+                        let endInt = self.visit_literal(&*end);
+                        for i in startInt..endInt {
+                            self.locals.insert(name.lexeme.clone(), i);
+                            for j in &body {
+                                self.process(j.clone());
+                            }
+                        }
+                    },
+                    _ => {panic!("not a variable")}
+                }
+            },
+            _ => {panic!("Not a For Loop")}
+        }
+
     }
 }
 

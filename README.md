@@ -47,3 +47,8 @@ cargo run
 ## Setting a Variable after Creation, If Block and Printing in DeusCL
 
 ![Setting a Variable after Creation, If Block and Printing](./Images/setAndIf.png "Setting a Variable after Creation, If Block and Printing")
+
+
+## Loop in DeusCL
+
+![For Loop](./Images/loop.png "Print evens from 0 to 10")

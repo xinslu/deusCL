@@ -11,6 +11,7 @@ pub struct Parser {
     token_list: Vec<Token>
 }
 
+
 impl Parser{
     pub fn create(tokens: Vec<Token>) -> Parser{
         Parser {
@@ -89,7 +90,10 @@ impl Parser{
             }
             TokenTypes::IF => {
                 return self.if_declaration()
-            }
+            },
+            TokenTypes::LOOP => {
+                return self.loop_declaration()
+            },
             _ => {
                 panic!("Not a Valid Operator {:?}", self.token_list[self.current as usize]._type);
             }
@@ -172,6 +176,7 @@ impl Parser{
             if body && !self.r#match(TokenTypes::RightParen){
                 self.r#match(TokenTypes::LeftParen);
                 bodyVec.push(self.equality());
+                println!("{:?}", self.peek());
                 self.current += 1;
             }
         }
@@ -235,7 +240,6 @@ impl Parser{
             expr = Box::new(Expression::Literal {token: self.peek().clone()});
             self.current+=1;
         }
-        self.current+=1;
         Expression::Print {
             print: expr
         }
@@ -265,6 +269,36 @@ impl Parser{
         return ret;
     }
 
+
+    pub fn loop_declaration(&mut self) -> Expression {
+        let mut loopVec: Vec<Expression> = Vec::new();
+        self.current+=1;
+        self.matchPanic(TokenTypes::LeftParen);
+        let name : Box<Expression> = Box::new(Expression::Variable {name: self.matchPanic(TokenTypes::IDENTIFIER)});
+        let start : Box<Expression> =  Box::new(Expression::Literal {token: self.matchPanic(TokenTypes::Number)});
+        let end : Box<Expression> =  Box::new(Expression::Literal {token: self.matchPanic(TokenTypes::Number)});
+        self.matchPanic(TokenTypes::RightParen);
+        loop {
+            if self.r#match(TokenTypes::RightParen) || self.r#match(TokenTypes::LeftParen) { }
+            if self.is_at_end() {
+                break;
+            } else {
+                // println!("{:?}", self.peek());
+                loopVec.push(self.equality());
+                // println!("{:?}", loopVec);
+                self.current += 1;
+            }
+
+        }
+        Expression::Loop {
+            variable: name,
+            start: start,
+            end: end,
+            body: loopVec
+        }
+
+    }
+
     pub fn check(&mut self, toktype: TokenTypes) -> bool{
         if self.is_at_end() {
             return false;
@@ -286,6 +320,14 @@ impl Parser{
         }
         self.current += 1;
         return true;
+    }
+
+    pub fn matchPanic(&mut self, expected: TokenTypes) -> Token {
+        if self.is_at_end() || self.check(expected) == false {
+            panic!("Excepted {:?}", expected);
+        }
+        self.current += 1;
+        return self.peek_before().clone();
     }
 
     pub fn peek(&mut self) -> &Token {
