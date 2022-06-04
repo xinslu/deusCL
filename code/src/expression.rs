@@ -29,6 +29,9 @@ pub enum Expression {
             declarations: Vec<Expression>
         }, Print {
             print: Box<Expression>
+        }, If {
+            body: Box<Expression>,
+            then: Option<Box<Expression>>
         }
 }
 

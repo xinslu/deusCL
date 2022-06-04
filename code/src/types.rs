@@ -40,7 +40,8 @@ pub enum TokenTypes {
     MOD,
     LET,
     SET,
-    PRINT
+    PRINT,
+    IF
 }
 
 #[derive(Debug)]

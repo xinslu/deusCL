@@ -54,6 +54,7 @@ impl Tokenizer{
                 "NIL" => self.tokens.push(Token {_type: TokenTypes::NIL, lexeme: text}),
                 "set" => self.tokens.push(Token {_type: TokenTypes::SET, lexeme: text}),
                 "print" => self.tokens.push(Token {_type: TokenTypes::PRINT, lexeme: text}),
+                "if" => self.tokens.push(Token {_type: TokenTypes::IF, lexeme: text}),
                 _ => {
                     if Tokenizer::is_digit(text.to_string()) {
                         self.tokens.push(Token {_type: TokenTypes::Number, lexeme: text});

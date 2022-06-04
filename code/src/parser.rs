@@ -87,6 +87,9 @@ impl Parser{
             TokenTypes::IDENTIFIER => {
                 return self.variable()
             }
+            TokenTypes::IF => {
+                return self.if_declaration()
+            }
             _ => {
                 panic!("Not a Valid Operator {:?}", self.token_list[self.current as usize]._type);
             }
@@ -232,6 +235,15 @@ impl Parser{
         }
         Expression::Print {
             print: expr
+        }
+    }
+
+    pub fn if_declaration(&mut self) -> Expression {
+        self.current+=1;
+        let Body : Expression =  self.equality();
+        Expression::If {
+            body: Box::new(Body),
+            then: None
         }
     }
 
