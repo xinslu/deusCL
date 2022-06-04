@@ -164,9 +164,9 @@ impl Parser{
                     expr = Box::new(self.equality());
                 } else {
                     expr = Box::new(Expression::Literal {token: self.peek().clone()});
+                    self.current+=1;
                 }
                 local.push(Expression::Assignment {name , expr});
-                self.current+=1;
             }
 
             if body && !self.r#match(TokenTypes::RightParen){
@@ -235,6 +235,7 @@ impl Parser{
             expr = Box::new(Expression::Literal {token: self.peek().clone()});
             self.current+=1;
         }
+        self.current+=1;
         Expression::Print {
             print: expr
         }
@@ -245,10 +246,16 @@ impl Parser{
         let condition = self.equality();
         self.current+=1;
         let Body : Expression =  self.equality();
+        let mut then : Option<Box<Expression>> = None;
+        self.current -=1;
+        if self.r#match(TokenTypes::LeftParen) {
+            then = Some(Box::new(self.equality()))
+        }
+        self.current+=1;
         Expression::If {
             condition: Box::new(condition),
             body: Box::new(Body),
-            then: None
+            then: then
         }
     }
 

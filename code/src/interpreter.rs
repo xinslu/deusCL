@@ -379,12 +379,21 @@ impl Visitor for Interpreter {
 
     fn visit_if(&mut self, ifBlock: Expression) {
         match ifBlock {
-            Expression::If {condition, body, then: _} => {
+            Expression::If {condition, body, then} => {
                 match *condition {
                     Expression::Logical {operator: _, expr: _} => {
                         let cond = self.visit_logical(*condition);
                         if cond == true {
                             self.process(*body);
+                        } else {
+                            match then {
+                                Some(thenBody) => {
+                                    self.process(*thenBody);
+                                },
+                                _ => {
+
+                                }
+                            }
                         }
                     },
                     _ => {
