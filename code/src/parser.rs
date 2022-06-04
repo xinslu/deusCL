@@ -108,6 +108,8 @@ impl Parser{
                 literals.push(self.equality());
             } else if self.r#match(TokenTypes::Number)  || self.r#match(TokenTypes::NIL) {
                 literals.push(Expression::Literal {token: self.peek_before().clone()});
+            } else if self.r#match(TokenTypes::IDENTIFIER){
+                literals.push(Expression::Variable {name: self.peek_before().clone()});
             }
         }
         Expression::Logical {operator: operator, expr: literals}
@@ -239,9 +241,12 @@ impl Parser{
     }
 
     pub fn if_declaration(&mut self) -> Expression {
+        self.current+=2;
+        let condition = self.equality();
         self.current+=1;
         let Body : Expression =  self.equality();
         Expression::If {
+            condition: Box::new(condition),
             body: Box::new(Body),
             then: None
         }

@@ -30,6 +30,7 @@ pub enum Expression {
         }, Print {
             print: Box<Expression>
         }, If {
+            condition: Box<Expression>,
             body: Box<Expression>,
             then: Option<Box<Expression>>
         }

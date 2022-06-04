@@ -18,14 +18,15 @@ pub fn repl() {
         let mut tokenizer = Tokenizer::create();
         match readline {
             Ok(line) => {
-                rl.add_history_entry(line.as_str());
-                let _result =  tokenizer.tokenize(line);
+                let processed_line= str::replace(line.as_str(), "\n", " ");
+                rl.add_history_entry(processed_line.clone());
+                let _result =  tokenizer.tokenize(processed_line.to_string());
                 // println!("created parser");
                 // tokenizer.print_tokens();
                 // println!("right after print");
                 let mut _parser = Parser::create(tokenizer.tokens);
                 let _parseresult = _parser.parse();
-                println!("{:?}", _parseresult);
+                // println!("{:?}", _parseresult);
                 let mut _interpreter = Interpreter::new();
                 _interpreter.accept(_parseresult.unwrap()[0].clone());
             },

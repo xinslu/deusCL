@@ -58,6 +58,8 @@ impl Tokenizer{
                 _ => {
                     if Tokenizer::is_digit(text.to_string()) {
                         self.tokens.push(Token {_type: TokenTypes::Number, lexeme: text});
+                    } else if text.chars().nth(0).unwrap() == '\"' {
+                        self.tokens.push(Token {_type: TokenTypes::STRINGLITERAL, lexeme: text});
                     } else if text.chars().all(char::is_alphanumeric) {
                         self.tokens.push(Token {_type: TokenTypes::IDENTIFIER, lexeme: text});
                     } else {

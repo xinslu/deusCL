@@ -31,7 +31,7 @@ pub enum TokenTypes {
     LessEqual,
     MAX,
     MIN,
-    StringLiteral,
+    STRINGLITERAL,
     List,
     AND,
     OR,

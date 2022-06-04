@@ -45,9 +45,20 @@ impl Interpreter {
             Expression::Print { print: _ } => {
                 self.visit_print(expression);
             },
-            Expression::Literal { token: _ } => {
-                self.visit_literal(&expression);
-            }
+            Expression::Literal { ref token} => {
+                match token._type {
+                    TokenTypes::STRINGLITERAL => {
+                        self.visit_string(expression);
+                    },
+                    _ => {
+                        self.visit_literal(&expression);
+                    }
+                }
+
+            },
+            Expression::If {condition: _, body: _, then: _} => {
+                self.visit_if(expression);
+            },
             _ => {
                 println!("Unsupported Operation Right Now");
             }
@@ -76,7 +87,22 @@ impl Interpreter {
             },
             Expression::Variable { name: _ } => {
                 Box::new(self.visit_literal(&expression))
-            }
+            },
+            Expression::Literal { ref token} => {
+                match token._type {
+                    TokenTypes::STRINGLITERAL => {
+                        Box::new(self.visit_string(expression))
+                    },
+                    _ => {
+                        Box::new(self.visit_literal(&expression))
+                    }
+                }
+
+            },
+            Expression::If {condition: _, body: _, then: _} => {
+                self.visit_if(expression);
+                Box::new("")
+            },
             _ => {
                 println!("Unsupported Operation Right Now");
                 Box::new("")
@@ -289,12 +315,12 @@ impl Visitor for Interpreter {
                                     self.locals.insert(name.lexeme, self.visit_literal(&*expr));
                                 },
                                 _ => {
-                                    panic!("bruh");
+                                    panic!("Not a Variable");
                                 }
                             }
                         },
                         _ => {
-                            panic!("Bruh");
+                            panic!("Not a Variable");
                         }
                     }
                 }
@@ -347,6 +373,45 @@ impl Visitor for Interpreter {
             },
             _ => {
                 panic!("Illegal Operation");
+            }
+        }
+    }
+
+    fn visit_if(&mut self, ifBlock: Expression) {
+        match ifBlock {
+            Expression::If {condition, body, then: _} => {
+                match *condition {
+                    Expression::Logical {operator: _, expr: _} => {
+                        let cond = self.visit_logical(*condition);
+                        if cond == true {
+                            self.process(*body);
+                        }
+                    },
+                    _ => {
+                        panic!("Wrong Type Of Condition");
+                    }
+                }
+            },
+            _ => {
+                panic!("Invalid Type")
+            }
+        }
+    }
+
+    fn visit_string(&mut self, string: Expression) -> String{
+        match string {
+            Expression::Literal{token} => {
+                match token._type {
+                    TokenTypes::STRINGLITERAL => {
+                        return token.lexeme;
+                    },
+                    _ => {
+                        panic!("Not a string");
+                    }
+                }
+            }
+            _ => {
+                panic!("Not a String");
             }
         }
     }

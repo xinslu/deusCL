@@ -10,4 +10,6 @@ pub trait Visitor {
     fn visit_local(&mut self, loc: Expression);
     fn visit_set(&mut self, set: Expression);
     fn visit_print(&mut self, print: Expression);
+    fn visit_if(&mut self, ifBlock: Expression);
+    fn visit_string(&mut self, string: Expression) -> String;
 }
