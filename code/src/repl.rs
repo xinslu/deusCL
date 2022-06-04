@@ -25,7 +25,7 @@ pub fn repl() {
                 // println!("right after print");
                 let mut _parser = Parser::create(tokenizer.tokens);
                 let _parseresult = _parser.parse();
-                // println!("{:?}", _parseresult);
+                println!("{:?}", _parseresult);
                 let mut _interpreter = Interpreter::new();
                 _interpreter.accept(_parseresult.unwrap()[0].clone());
             },
