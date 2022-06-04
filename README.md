@@ -42,3 +42,8 @@ cargo run
 ## Local Variable Creation and usage in DeusCL
 
 ![Local Variables](./Images/variable.png "Local Variables in DeusCL")
+
+
+## Setting a Variable after Creation, If Block and Printing in DeusCL
+
+![Setting a Variable after Creation, If Block and Printing](./Images/setAndIf.png "Setting a Variable after Creation, If Block and Printing")
