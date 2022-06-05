@@ -8,7 +8,7 @@ pub struct Tokenizer {
 }
 
 impl Tokenizer{
-    pub fn create() -> Tokenizer{
+    pub fn new() -> Tokenizer{
         Tokenizer {
             line: vec![],
             tokens: vec![],
@@ -21,7 +21,7 @@ impl Tokenizer{
         println!("{:?}", self.tokens);
     }
 
-    pub fn tokenize(&mut self, expr: String) -> &Vec<String> {
+    pub fn tokenize(&mut self, expr: String) -> Result<&Vec<String>, &str> {
         self.line = expr.replace("(", " ( ").replace(")", " ) ").split_whitespace().map(|x| x.to_string()).collect();
         // println!("{:?}", self.line);
         while !self.is_at_end() {
@@ -61,12 +61,12 @@ impl Tokenizer{
                     } else if text.chars().all(char::is_alphanumeric) {
                         self.tokens.push(Token {_type: TokenTypes::IDENTIFIER, lexeme: text});
                     } else {
-                        panic!("Something wrong with {}", text);
+                        return Err(&format!("ERROR: Cannot Recognize Token {}", text))
                     }
                 }
             }
         }
-        return &self.line;
+        return Ok(&self.line);
     }
 
 

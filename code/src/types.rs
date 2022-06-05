@@ -48,19 +48,6 @@ pub enum TokenTypes {
 
 #[derive(Debug)]
 pub enum Errors {
-    FunctionFormat,
-    NotANumber,
-    NumArguments(usize, usize),
-    ParseError(String),
-    ReadLineError(String),
-    WrongType(String, String),
-    FunctionNoDefined(String),
-    DivisionByZero,
-}
-
-
-
-struct Environment {
-  data: HashMap<String, Token>,
+    Reason(String)
 }
 

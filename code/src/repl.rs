@@ -1,9 +1,9 @@
+use crate::interpreter::Interpreter;
+use crate::parser::Parser;
 use crate::tokenizer::Tokenizer;
+use log;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
-use crate::parser::Parser;
-use log;
-use crate::interpreter::Interpreter;
 use std::panic;
 
 pub fn repl() {
@@ -14,32 +14,39 @@ pub fn repl() {
     }
     loop {
         let readline = rl.readline("DEUS-USER> ");
-        let mut tokenizer = Tokenizer::create();
+        let mut tokenizer = Tokenizer::new();
         match readline {
             Ok(line) => {
-                let processed_line= str::replace(line.as_str(), "\n", " ");
+                let processed_line = str::replace(line.as_str(), "\n", " ");
                 rl.add_history_entry(processed_line.clone());
-                let _result =  tokenizer.tokenize(processed_line.to_string());
+                let _result = tokenizer.tokenize(processed_line.to_string());
                 // println!("created parser");
                 // tokenizer.print_tokens();
                 // println!("right after print");
-                let mut _parser = Parser::create(tokenizer.tokens);
-                let _parseresult = _parser.parse();
-                // println!("{:?}", _parseresult);
-                _interpreter.accept(_parseresult.unwrap()[0].clone());
-                _interpreter.clean_env();
-            },
+                match Parser::new(tokenizer.tokens).parse() {
+                    Ok(parserresult) => {
+                        // println!("{:?}", parserresult);
+                        if let Err(error) = _interpreter.accept(parserresult.clone()) {
+                            println!("{}", error);
+                        }
+                        _interpreter.clean_env();
+                    }
+                    Err(error) => {
+                        println!("{:?}", error);
+                    }
+                }
+            }
             Err(ReadlineError::Interrupted) => {
                 log::info!("Bye!!");
-                break
-            },
+                break;
+            }
             Err(ReadlineError::Eof) => {
                 log::info!("CTRL-D");
-                break
-            },
+                break;
+            }
             Err(err) => {
                 log::warn!("Error: {:?}", err);
-                break
+                break;
             }
         }
     }

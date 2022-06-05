@@ -33,13 +33,13 @@ impl Encapsulation for bool {
 
 
 impl Values {
-    pub fn matchInteger(&self) -> i64 {
+    pub fn matchInteger(&self) -> Result<i64,&'static str> {
         match self {
             Values::Int(integer) => {
-                return *integer;
+                return Ok(*integer);
             },
             _ => {
-                panic!("Wrong Type Excepted Integer");
+                Err("Wrong Type Excepted Integer")
             }
         }
     }
@@ -83,16 +83,16 @@ impl Environment {
     }
 
 
-    pub fn get(&self, name: String) -> Values {
+    pub fn get(&self, name: String) -> Result<Values, &'static str> {
         match self.map.get(&name) {
-            Some(value) => { value.clone() },
+            Some(value) => { Ok(value.clone()) },
             None => {
                 match &*self.enclosing {
                     Some(enclosing) => {
                         return enclosing.get(name);
                     },
                     None => {
-                        panic!("Variable not Defined")
+                        Err("ERROR: Variable not Defined")
                     }
                 }
             }
@@ -129,16 +129,15 @@ impl Environment {
         return environment
     }
 
-    pub fn getAt(&mut self, name: String, distance : i32) -> Values {
+    pub fn getAt(&mut self, name: String, distance : i32) -> Result<Values, &'static str> {
         if let Some(value) = self.ancestor(distance).map.get(&name) {
-            return value.clone();
-        } else {
-            panic!("Variable Not Found!");
+            return Ok(value.clone());
         }
+        Err("ERROR: Variable Not Found!")
     }
 
 
-    pub fn assignAt<T: 'static>(&mut self, name: String, value: T, distance : i32) where T:  Encapsulation {
+    pub fn assignAt<T: 'static>(&mut self, name: String, value: T, distance : i32) -> Result<(), &'static str>where T:  Encapsulation {
         let mut environment = &mut *self;
         for _i in 0..distance {
             match &mut *environment.enclosing{
@@ -146,10 +145,11 @@ impl Environment {
                     environment = enclosing
                 },
                 _ => {
-                    panic!("Wrong Distance");
+                    return Err("Wrong Distance");
                 }
             }
         }
         environment.assign(name,value);
+        Ok(())
     }
 }
