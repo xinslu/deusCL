@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::fmt;
-
 use crate::types::Error;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -153,7 +152,7 @@ impl Environment {
                 }
             }
         }
-        environment.assign(name,value);
+        environment.assign(name,value)?;
         Ok(())
     }
 }

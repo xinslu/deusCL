@@ -6,6 +6,7 @@ pub struct Tokenizer {
     current: i32,
     start: i32,
 }
+use regex::Regex;
 
 impl Tokenizer{
     pub fn new() -> Tokenizer{
@@ -22,6 +23,17 @@ impl Tokenizer{
     }
 
     pub fn tokenize(&mut self, expr: String) -> Result<&Vec<String>, Error> {
+        // println!("{:?}",r#"(?:[^" "']|"[^"]*"|'[^']*')+/gimu"# );
+        // if let Ok(seperator) = Regex::new(r#"(?:[^" "']|"[^"]*"|'[^']*')+"#) {
+        //     let temp = expr.replace("(", " ( ").replace(")", " ) ");
+        //     println!("{:?}", temp);
+        //     let tempList: Vec<_>= seperator.split(&temp).collect();
+        //     println!("{:?}", tempList);
+        //     self.line = tempList.iter().map(|x| x.to_string()).collect();
+        //     println!("{:?}", self.line);
+        // } else {
+        //    return Err(Error::Reason("Cannot Tokenize".to_string()))
+        // }
         self.line = expr.replace("(", " ( ").replace(")", " ) ").split_whitespace().map(|x| x.to_string()).collect();
         // println!("{:?}", self.line);
         while !self.is_at_end() {
