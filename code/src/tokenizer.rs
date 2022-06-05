@@ -69,7 +69,15 @@ impl Tokenizer{
                     if Tokenizer::is_digit(text.to_string()) {
                         self.tokens.push(Token {_type: TokenTypes::Number, lexeme: text});
                     } else if text.chars().nth(0).unwrap() == '\"' {
-                        self.tokens.push(Token {_type: TokenTypes::STRINGLITERAL, lexeme: text});
+                        if let Some(value) = text.chars().last(){
+                            if value == '\"' {
+                                self.tokens.push(Token {_type: TokenTypes::STRINGLITERAL, lexeme: text});
+                            } else {
+                                self.current -= 1;
+                                let multiWordString = self.mutliWordString();
+                                self.tokens.push(Token {_type: TokenTypes::STRINGLITERAL, lexeme: multiWordString} );
+                            }
+                        }
                     } else if text.chars().all(char::is_alphanumeric) {
                         self.tokens.push(Token {_type: TokenTypes::IDENTIFIER, lexeme: text});
                     } else {
@@ -79,6 +87,23 @@ impl Tokenizer{
             }
         }
         return Ok(&self.line);
+    }
+
+    pub fn mutliWordString(&mut self) -> String {
+        let mut string :String = "".to_string();
+        let mut text : String;
+        loop {
+            text = self.advance().to_string();
+            if self.is_at_end() {
+                break;
+            }
+            if text.clone().chars().nth(text.len()-1).unwrap() == '\"' {
+                string += &text;
+                break;
+            }
+            string += &(text + " ");
+        }
+        return string
     }
 
 

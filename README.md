@@ -25,7 +25,7 @@ Installing on Windows you can just use this link https://static.rust-lang.org/ru
 You can run the REPL, doing the following in a terminal:
 ```
 git clone https://github.com/xinslu/deusCL.git
-cd deusCL/code
+cd deusCL/frontend
 cargo run
 ```
 
