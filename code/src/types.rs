@@ -1,10 +1,6 @@
 use std::collections::HashMap;
-
-
-
-pub use crate::token:: {
-    Token
-};
+use std::fmt;
+pub use crate::token:: Token;
 
 #[derive(Clone, Debug, Copy)]
 pub enum TokenFunction {
@@ -47,7 +43,27 @@ pub enum TokenTypes {
 }
 
 #[derive(Debug)]
-pub enum Errors {
+pub enum Error {
     Reason(String)
 }
+
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::Reason(string) => {
+                write!(f, "ERROR: {}", string)
+            }
+        }
+
+    }
+}
+
+impl fmt::Display for TokenTypes {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+
 

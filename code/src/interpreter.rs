@@ -1,6 +1,6 @@
 use crate::environment::Encapsulation;
 use crate::environment::Values;
-use crate::{expression::Expression, types::TokenTypes, environment::Environment, visitors::Visitor};
+use crate::{expression::Expression, types::{TokenTypes, Error}, environment::Environment, visitors::Visitor};
 
 use std::cmp;
 use std::collections::HashMap;
@@ -19,7 +19,7 @@ impl Interpreter {
             locals: HashMap::new()
         }
     }
-    pub fn accept(&mut self, expression: Expression ) -> Result<(), &'static str>{
+    pub fn accept(&mut self, expression: Expression ) -> Result<(), Error>{
         match expression {
             Expression::Logical {operator: _, expr: _} => {
                 println!("{:?}", self.visit_logical(expression)?);
@@ -65,22 +65,18 @@ impl Interpreter {
                 Ok(())
             }
             _ => {
-                Err("ERROR: Unsupported Operation Right Now")
+                Err(Error::Reason(format!("{:?} Unsupported Operation Right Now", expression)))
             }
         }
     }
 
-    pub fn process(&mut self, expression: Expression ) -> Result<Option<Values>, &'static str> {
+    pub fn process(&mut self, expression: Expression ) -> Result<Option<Values>, Error> {
         match expression {
             Expression::Logical {operator: _, expr: _} => {
                 Ok(Some((self.visit_logical(expression)?).return_value()))
             },
             Expression::Arithmetic { operator: _, expr: _ } => {
-                if let Ok(value) = self.visit_arithmetic(expression) {
-                    return Ok(Some(value.return_value()));
-                }
-                Err("ERROR: In Processsing Arithmetic Operation")
-
+                return Ok(Some( self.visit_arithmetic(expression)?.return_value()));
             },
             Expression::Local {declarations: _, body: _} => {
                 if let Err(error) = self.visit_local(expression) {
@@ -116,7 +112,7 @@ impl Interpreter {
                 Ok(None)
             },
             _ => {
-                Err("ERROR: Unsupported Operation")
+               Err(Error::Reason(format!("{:?} Unsupported Operation Right Now", expression)))
             }
         }
     }
@@ -125,9 +121,9 @@ impl Interpreter {
         self.locals = HashMap::new();
     }
 
-    pub fn comparision_lambda(&mut self, expr: Vec<Expression>, func: &dyn Fn(i64, i64) -> bool) -> Result<bool,&'static str>  {
+    pub fn comparision_lambda(&mut self, expr: Vec<Expression>, func: &dyn Fn(i64, i64) -> bool) -> Result<bool,Error>  {
         if expr.len() as i32 == 0 {
-            return Err("Error: Parsing Error, not enough arguements")
+            return Err(Error::Reason("Parsing Error, not enough arguements".to_string()))
         }
         let mut temp = (self.visit_literal(&expr[0])?).matchInteger()?;
         let mut rBool = true;
@@ -141,7 +137,7 @@ impl Interpreter {
         return Ok(rBool);
     }
 
-    pub fn logical_lambda(&mut self, expr: Vec<Expression>, mut rBool: bool,func: &dyn Fn(bool, bool) -> bool) -> Result<bool, &'static str>  {
+    pub fn logical_lambda(&mut self, expr: Vec<Expression>, mut rBool: bool,func: &dyn Fn(bool, bool) -> bool) -> Result<bool, Error>  {
         for i in &expr {
             match &i {
                 Expression::Literal {token} => {
@@ -163,7 +159,7 @@ impl Interpreter {
         return Ok(rBool);
     }
 
-    pub fn artihmetic_lambda(&self, expr: Vec<Expression>, func: &dyn Fn(i64, i64) -> i64) -> Result<i64, &'static str>  {
+    pub fn artihmetic_lambda(&self, expr: Vec<Expression>, func: &dyn Fn(i64, i64) -> i64) -> Result<i64, Error>  {
         let mut temp = (self.visit_literal(&expr[0])?).matchInteger()?;
         for i in &expr[1..] {
             temp = func(temp, (self.visit_literal(i)?).matchInteger()?);
@@ -173,7 +169,7 @@ impl Interpreter {
 
 }
 impl Visitor for Interpreter {
-    fn visit_logical(&mut self, log: Expression) -> Result<bool, &'static str> {
+    fn visit_logical(&mut self, log: Expression) -> Result<bool, Error> {
         let notequals = |a, b| a != b;
         let equals = |a, b| a == b;
         let greater = |a, b| a > b;
@@ -211,7 +207,7 @@ impl Visitor for Interpreter {
                     },
                     TokenTypes::NOT => {
                         if expr.len() > 1 {
-                            return Err("Cannot Have more than 1 Arguement");
+                            return Err(Error::Reason("Cannot Have more than 1 Arguement".to_string()))
                         }
                         match &expr[0] {
                             Expression::Literal {token} => {
@@ -226,7 +222,7 @@ impl Visitor for Interpreter {
                                                 return Ok(!(result != 0))
                                             }
                                         }
-                                        Err("ERROR: In processing Literal")
+                                        Err(Error::Reason("In processing Literal".to_string()))
                                     }
                                 },
                                 Expression::Logical { operator: _, expr: _ } => {
@@ -238,29 +234,29 @@ impl Visitor for Interpreter {
                         }
                     }
                     _ => {
-                        Err("ERROR: Unsupported Operator")
+                        Err(Error::Reason("Unsupported Operator".to_string()))
                     }
                 }
             },
             _=> {
-                Err("ERROR: Not a Logical Expression")
+                Err(Error::Reason("Not a Logical Expression".to_string()))
             }
         }
     }
 
-    fn visit_literal(&self, lit: &Expression) -> Result<Values, &'static str> {
+    fn visit_literal(&self, lit: &Expression) -> Result<Values, Error> {
         match &lit {
             Expression::Literal {token} => {
                 if let TokenTypes::Number = token._type {
                     return Ok(Values::Int(token.lexeme.parse().unwrap()));
                 }
-                Err("Should Be a Number Only!")
+                Err(Error::Reason(format!("Should Be a Number Only. But was of type {}", token)))
             },
             Expression::Arithmetic { operator: _, expr: _ } => {
                 if let Ok(value) = self.visit_arithmetic(lit.clone()) {
                     return Ok(Values::Int(value));
                 }
-                Err("ERROR: Error Processing Arithmetic Operation")
+                Err(Error::Reason("Error Processing Arithmetic Operation".to_string()))
 
             },
             Expression::Variable { name } => {
@@ -271,12 +267,12 @@ impl Visitor for Interpreter {
                return self.environment.get(name.lexeme.clone())
             }
             _ => {
-                Err("Not a Literal!")
+                Err(Error::Reason("Not a Literal!".to_string()))
             }
         }
     }
 
-    fn visit_arithmetic(&self, arith: Expression) -> Result<i64, &'static str> {
+    fn visit_arithmetic(&self, arith: Expression) -> Result<i64, Error> {
         let add = |a, b| a + b;
         let minus = |a, b| a - b;
         let multiply = |a, b| a * b;
@@ -307,28 +303,28 @@ impl Visitor for Interpreter {
                         return Ok(self.artihmetic_lambda(expr, &modulus)?);
                     },
                     _ => {
-                        Err("ERROR: Not a Valid Type!")
+                        Err(Error::Reason("Not a Valid Type!".to_string()))
                     }
                 }
             }
             _ => {
-                Err("ERROR: Not an Arithmetic Expression")
+                Err(Error::Reason("Not an Arithmetic Expression".to_string()))
             }
 
         }
     }
 
-    fn visit_local(&mut self, local: Expression) -> Result<(), &'static str>{
+    fn visit_local(&mut self, local: Expression) -> Result<(), Error>{
         if let Expression::Local{declarations, body} = local {
             for i in declarations {
                 if let Expression::Assignment { name, expr } = i {
                     if let Expression::Variable { name } = *name {
                         self.locals.insert(name.lexeme, self.visit_literal(&*expr)?);
                     } else {
-                        return Err("ERROR: Not a Variable in declared local block")
+                        return Err(Error::Reason("Not a Variable in declared local block".to_string()))
                     }
                 } else {
-                    return Err("ERROR: Not a Variable Assignment")
+                    return Err(Error::Reason("Not a Variable Assignment".to_string()))
                 }
             }
 
@@ -343,11 +339,11 @@ impl Visitor for Interpreter {
             }
             Ok(())
         } else {
-            Err("ERROR: Wrong Type of Declaration")
+            Err(Error::Reason("Wrong Type of Declaration".to_string()))
         }
     }
 
-    fn visit_set(&mut self, set: Expression) -> Result<(), &'static str>{
+    fn visit_set(&mut self, set: Expression) -> Result<(), Error>{
         match set {
             Expression::Set { declarations } => {
                 for i in declarations {
@@ -356,39 +352,39 @@ impl Visitor for Interpreter {
                             if let Expression::Variable { name } = *name {
                                 self.locals.insert(name.lexeme, self.visit_literal(&*expr)?);
                             } else {
-                                return Err("ERROR: Not a Variable");
+                                return Err(Error::Reason("Not a Variable".to_string()));
                             }
                         },
                         _ => {
-                            return Err("ERROR: Not an Assignment");
+                            return Err(Error::Reason("Not an Assignment".to_string()));
                         }
                     }
                 }
                 Ok(())
             },
             _ => {
-                Err("ERROR: Invalid Operation")
+                Err(Error::Reason("Invalid Operation".to_string()))
             }
         }
     }
 
 
-    fn visit_print(&mut self, print: Expression) -> Result<(), &'static str >{
+    fn visit_print(&mut self, print: Expression) -> Result<(), Error >{
         match print {
             Expression::Print { print } => {
                 if let Some(value) = self.process(*print)? {
                     Ok(println!("{}", value))
                 } else {
-                    Err("ERROR: Cannot Read Value")
+                    Err(Error::Reason("Cannot Read Value".to_string()))
                 }
             },
             _ => {
-                Err("ERROR: Illegal Operation")
+                Err(Error::Reason("Illegal Operation".to_string()))
             }
         }
     }
 
-    fn visit_if(&mut self, ifBlock: Expression) -> Result<(), &'static str>{
+    fn visit_if(&mut self, ifBlock: Expression) -> Result<(), Error>{
         match ifBlock {
             Expression::If {condition, body, then} => {
                 match *condition {
@@ -408,31 +404,31 @@ impl Visitor for Interpreter {
                         }
                     },
                     _ => {
-                        Err("ERROR: Not a logical condition")
+                        Err(Error::Reason("Not a logical condition".to_string()))
                     }
                 }
             },
             _ => {
-                Err("ERROR: Invalid Type of Operator")
+                Err(Error::Reason("Invalid Type of Operator".to_string()))
             }
         }
     }
 
-    fn visit_string(&mut self, string: Expression) -> Result<String, &'static str>{
+    fn visit_string(&mut self, string: Expression) -> Result<String, Error>{
         match string {
             Expression::Literal{token} => {
                 if let TokenTypes::STRINGLITERAL = token._type {
                     return Ok(token.lexeme);
                 } else {
-                    Err("Not a string")
+                    Err(Error::Reason("Not a string".to_string()))
                 }
             }
             _ => {
-                Err("Not a String")
+                Err(Error::Reason("Not a String".to_string()))
             }
         }
     }
-    fn visit_for(&mut self, loopExpr: Expression) -> Result<(), &'static str>{
+    fn visit_for(&mut self, loopExpr: Expression) -> Result<(), Error>{
         match loopExpr {
             Expression::Loop {variable, start, end, body} => {
                 match *variable {
@@ -449,14 +445,14 @@ impl Visitor for Interpreter {
                         }
                         Ok(())
                     },
-                    _ => {Err("ERROR: Incorrect Variable")}
+                    _ => {Err(Error::Reason("Not an Intializer Variable".to_string()))}
                 }
             },
-            _ => {Err("ERROR: Not a For Loop")}
+            _ => {Err(Error::Reason("Not a For Loop".to_string()))}
         }
 
     }
-    fn visit_global(&mut self, global: Expression) -> Result<(), &'static str>{
+    fn visit_global(&mut self, global: Expression) -> Result<(), Error>{
         if let Expression::Global { name, expr } = global {
             if let Expression::Variable { name } = *name {
                 let value = self.visit_literal(&*expr)?;
@@ -464,9 +460,9 @@ impl Visitor for Interpreter {
                 self.environment.define(nameVar, value.clone());
                 return Ok(());
             }
-            Err("ERROR: Not a Variable")
+            Err(Error::Reason("Not a Variable".to_string()))
         } else {
-            Err("ERROR: Not a GLobal Variable Declaration")
+            Err(Error::Reason("Not a Global Variable Declaration".to_string()))
         }
     }
 }

@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::fmt;
 
+use crate::types::Error;
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Values {
     Int(i64),
@@ -33,13 +35,13 @@ impl Encapsulation for bool {
 
 
 impl Values {
-    pub fn matchInteger(&self) -> Result<i64,&'static str> {
+    pub fn matchInteger(&self) -> Result<i64,Error> {
         match self {
             Values::Int(integer) => {
                 return Ok(*integer);
             },
             _ => {
-                Err("Wrong Type Excepted Integer")
+                Err(Error::Reason("Wrong Type Excepted Integer".to_string()))
             }
         }
     }
@@ -83,7 +85,7 @@ impl Environment {
     }
 
 
-    pub fn get(&self, name: String) -> Result<Values, &'static str> {
+    pub fn get(&self, name: String) -> Result<Values, Error> {
         match self.map.get(&name) {
             Some(value) => { Ok(value.clone()) },
             None => {
@@ -92,23 +94,25 @@ impl Environment {
                         return enclosing.get(name);
                     },
                     None => {
-                        Err("ERROR: Variable not Defined")
+                        Err(Error::Reason(format!("Variable {} is not Defined", name)))
                     }
                 }
             }
         }
     }
 
-    pub fn assign<T>(&mut self, name: String, value: T) where T:  Encapsulation {
+    pub fn assign<T>(&mut self, name: String, value: T) -> Result<(), Error> where T:  Encapsulation {
         if let Some(newValue) = self.map.get_mut(&name) {
                 *newValue = value.return_value();
+                Ok(())
         } else {
             match &mut *self.enclosing {
                 Some(enclosing) => {
-                    enclosing.assign(name, value);
+                    enclosing.assign(name, value)?;
+                    return Ok(());
                 },
                 None => {
-                    panic!("Variable not Defined")
+                    Err(Error::Reason("Variable not Defined".to_string()))
                 }
             }
         }
@@ -129,15 +133,15 @@ impl Environment {
         return environment
     }
 
-    pub fn getAt(&mut self, name: String, distance : i32) -> Result<Values, &'static str> {
+    pub fn getAt(&mut self, name: String, distance : i32) -> Result<Values, Error> {
         if let Some(value) = self.ancestor(distance).map.get(&name) {
             return Ok(value.clone());
         }
-        Err("ERROR: Variable Not Found!")
+        Err(Error::Reason("Variable Not Found!".to_string()))
     }
 
 
-    pub fn assignAt<T: 'static>(&mut self, name: String, value: T, distance : i32) -> Result<(), &'static str>where T:  Encapsulation {
+    pub fn assignAt<T: 'static>(&mut self, name: String, value: T, distance : i32) -> Result<(), Error>where T:  Encapsulation {
         let mut environment = &mut *self;
         for _i in 0..distance {
             match &mut *environment.enclosing{
@@ -145,7 +149,7 @@ impl Environment {
                     environment = enclosing
                 },
                 _ => {
-                    return Err("Wrong Distance");
+                    return Err(Error::Reason("Wrong Distance".to_string()));
                 }
             }
         }

@@ -1,6 +1,6 @@
 use crate::token::Token;
 use crate::{types::{
-    Errors, TokenTypes
+    Error, TokenTypes
 }, expression::Expression};
 use std::mem;
 pub struct Parser {
@@ -16,13 +16,13 @@ impl Parser{
             token_list: tokens
         }
     }
-    pub fn parse(&mut self) -> Result<Expression, &'static str> {
-        self.current+=1;
+    pub fn parse(&mut self) -> Result<Expression, Error> {
+        self.matchPanic(TokenTypes::LeftParen)?;
         let expr = self.equality()?;
         return Ok(expr);
     }
 
-    pub fn equality(&mut self) -> Result<Expression, &'static str> {
+    pub fn equality(&mut self) -> Result<Expression,Error> {
         // print!("in equality");
         match self.token_list[self.current as usize]._type {
             TokenTypes::EQUAL => {
@@ -95,12 +95,12 @@ impl Parser{
                 return Ok(self.var_declaration()?)
             }
             _ => {
-                Err("ERROR: Invalid Operator")
+                Err(Error::Reason(format!("Invalid Operator: {}", self.peek())))
             }
         }
     }
 
-    pub fn return_logical(&mut self) -> Result<Expression, &'static str> {
+    pub fn return_logical(&mut self) -> Result<Expression,Error> {
         let mut literals: Vec<Expression> = Vec::new();
         let operator = self.token_list[self.current as usize].clone();
         self.current+=1;
@@ -120,7 +120,7 @@ impl Parser{
     }
 
 
-    pub fn return_arithmetic(&mut self) -> Result<Expression, &'static str> {
+    pub fn return_arithmetic(&mut self) -> Result<Expression,Error> {
         let mut arith: Vec<Expression> = Vec::new();
         let operator = self.token_list[self.current as usize].clone();
         self.current+=1;
@@ -140,7 +140,7 @@ impl Parser{
     }
 
 
-    pub fn local_declaration(&mut self) -> Result<Expression, &'static str> {
+    pub fn local_declaration(&mut self) -> Result<Expression,Error> {
         let mut local: Vec<Expression> = Vec::new();
         let mut bodyVec: Vec<Expression> = Vec::new();
         let mut body = false;
@@ -186,7 +186,7 @@ impl Parser{
     }
 
 
-    pub fn set_declaration(&mut self) -> Result<Expression, &'static str> {
+    pub fn set_declaration(&mut self) -> Result<Expression,Error> {
         let mut local: Vec<Expression> = Vec::new();
         self.current+=1;
         let mut open = 1;
@@ -227,7 +227,7 @@ impl Parser{
         })
     }
 
-    pub fn print_declration(&mut self) -> Result<Expression, &'static str> {
+    pub fn print_declration(&mut self) -> Result<Expression,Error> {
         self.current+=1;
         let expr;
         if self.r#match(TokenTypes::LeftParen) {
@@ -244,7 +244,7 @@ impl Parser{
         })
     }
 
-    pub fn if_declaration(&mut self) -> Result<Expression, &'static str> {
+    pub fn if_declaration(&mut self) -> Result<Expression,Error> {
         self.current+=2;
         let condition = self.equality()?;
         self.current+=1;
@@ -269,7 +269,7 @@ impl Parser{
     }
 
 
-    pub fn loop_declaration(&mut self) -> Result<Expression, &'static str> {
+    pub fn loop_declaration(&mut self) -> Result<Expression,Error> {
         let mut loopVec: Vec<Expression> = Vec::new();
         self.current+=1;
         self.matchPanic(TokenTypes::LeftParen)?;
@@ -297,7 +297,7 @@ impl Parser{
         })
     }
 
-    pub fn var_declaration(&mut self) -> Result<Expression, &'static str> {
+    pub fn var_declaration(&mut self) -> Result<Expression,Error> {
         self.matchPanic(TokenTypes::VAR)?;
         let name = Expression::Variable {name: self.matchPanic(TokenTypes::IDENTIFIER)?};
         let expr;
@@ -333,9 +333,9 @@ impl Parser{
         return true;
     }
 
-    pub fn matchPanic(&mut self, expected: TokenTypes) -> Result<Token, &'static str> {
+    pub fn matchPanic(&mut self, expected: TokenTypes) -> Result<Token,Error> {
         if self.is_at_end() || self.check(expected) == false {
-            return Err("ERROR: Excepted a different Type of Token")
+            return Err(Error::Reason("ERROR: Excepted a different Type of Token".to_string()))
         }
         self.current += 1;
         return Ok(self.peek_before().clone());

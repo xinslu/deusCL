@@ -19,7 +19,9 @@ pub fn repl() {
             Ok(line) => {
                 let processed_line = str::replace(line.as_str(), "\n", " ");
                 rl.add_history_entry(processed_line.clone());
-                let _result = tokenizer.tokenize(processed_line.to_string());
+                if let Err(error) = tokenizer.tokenize(processed_line.to_string()) {
+                    println!("{}", error);
+                } else {
                 // println!("created parser");
                 // tokenizer.print_tokens();
                 // println!("right after print");
@@ -35,6 +37,8 @@ pub fn repl() {
                         println!("{:?}", error);
                     }
                 }
+                }
+
             }
             Err(ReadlineError::Interrupted) => {
                 log::info!("Bye!!");

@@ -1,4 +1,4 @@
-pub use crate::types::TokenTypes;
+pub use crate::types::{TokenTypes, Error};
 pub use crate::token:: Token;
 pub struct Tokenizer {
     line: Vec<String>,
@@ -21,7 +21,7 @@ impl Tokenizer{
         println!("{:?}", self.tokens);
     }
 
-    pub fn tokenize(&mut self, expr: String) -> Result<&Vec<String>, &str> {
+    pub fn tokenize(&mut self, expr: String) -> Result<&Vec<String>, Error> {
         self.line = expr.replace("(", " ( ").replace(")", " ) ").split_whitespace().map(|x| x.to_string()).collect();
         // println!("{:?}", self.line);
         while !self.is_at_end() {
@@ -61,7 +61,7 @@ impl Tokenizer{
                     } else if text.chars().all(char::is_alphanumeric) {
                         self.tokens.push(Token {_type: TokenTypes::IDENTIFIER, lexeme: text});
                     } else {
-                        return Err(&format!("ERROR: Cannot Recognize Token {}", text))
+                        return Err(Error::Reason(format!("Cannot Recognize token {}", text)))
                     }
                 }
             }
