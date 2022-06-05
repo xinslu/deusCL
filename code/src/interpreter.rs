@@ -1,8 +1,11 @@
+use crate::environment::Values;
 use crate::{expression::Expression, types::TokenTypes, environment::Environment, visitors::Visitor};
 
 use std::cmp;
 use std::collections::HashMap;
 use std::fmt::Display;
+
+use std::any::Any;
 
 pub struct Interpreter {
     environment: Environment,
@@ -236,7 +239,15 @@ impl Visitor for Interpreter {
                 if let Some(value) = self.locals.get(&name.lexeme) {
                     return *value;
                 }
-                return *self.environment.get(name.lexeme);
+                match self.environment.get(name.lexeme.clone()) {
+                    Values::Int(int) => {return int},
+                    Values::Str(_) => {
+                        panic!("Not of Right type")
+                    }
+                    Values::Bool(_) => {
+                        panic!("Not of Right type")
+                    }
+                }
             }
             _ => {
                 panic!("Not a Literal!");
@@ -409,8 +420,10 @@ impl Visitor for Interpreter {
     fn visit_global(&mut self, global: Expression) {
         if let Expression::Global { name, expr } = global {
             if let Expression::Variable { name } = *name {
-                let value = self.process(*expr);
-                self.environment.define(name.lexeme, value)
+                let value = self.visit_literal(&*expr);
+                let nameVar = name.lexeme.clone();
+                self.environment.define(nameVar, value);
+                self.locals.insert(name.lexeme, value);
             }
         } else {
             panic!("Not a GLobal Variable declarations");

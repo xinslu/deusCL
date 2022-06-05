@@ -1,11 +1,40 @@
 use std::collections::HashMap;
 use std::fmt::Display;
 
-pub use crate::token:: {
-    Token
-};
+#[derive(Debug, Clone)]
+pub enum Values {
+    Int(i64),
+    Str(String),
+    Bool(bool)
+}
+
+trait Encapsulation {
+    fn return_value(&self) -> Values;
+}
+
+impl Encapsulation for i64 {
+    fn return_value(&self) -> Values {
+        return Values::Int(*self);
+    }
+
+}
+
+impl Encapsulation for String {
+    fn return_value(&self) -> Values {
+        return Values::Str(self.to_string());
+    }
+}
+
+impl Encapsulation for bool {
+    fn return_value(&self) -> Values {
+        return Values::Bool(*self);
+    }
+}
+
+
+pub use crate::token:: Token;
 pub struct Environment {
-    map: HashMap<String, Box<dyn Display + 'static>>,
+    map: HashMap<String, Values>,
     enclosing: Box<Option<Environment>>
 }
 
@@ -17,14 +46,14 @@ impl Environment {
         }
     }
 
-    pub fn define<T: 'static>(&mut self, name: String, value: T) where T:  Display {
-        self.map.insert(name, Box::new(value));
+    pub fn define<T: 'static>(&mut self, name: String, value: T) where T:  Encapsulation {
+        self.map.insert(name, value.return_value() );
     }
 
 
-    pub fn get(&self, name: String) -> Box<dyn Display + '_> {
+    pub fn get(&self, name: String) -> Values {
         match self.map.get(&name) {
-            Some(value) => return Box::new(value),
+            Some(value) => { value.clone() },
             None => {
                 match &*self.enclosing {
                     Some(enclosing) => {
@@ -38,9 +67,9 @@ impl Environment {
         }
     }
 
-    pub fn assign<T: 'static>(&mut self, name: String, value: T) where T:  Display {
+    pub fn assign<T>(&mut self, name: String, value: T) where T:  Encapsulation {
         if let Some(newValue) = self.map.get_mut(&name) {
-                *newValue = Box::new(value);
+                *newValue = value.return_value();
         } else {
             match &mut *self.enclosing {
                 Some(enclosing) => {
@@ -68,21 +97,21 @@ impl Environment {
         return environment
     }
 
-    pub fn getAt(&mut self, name: String, distance : i32) -> Box<dyn Display + '_> {
+    pub fn getAt(&mut self, name: String, distance : i32) -> Values {
         if let Some(value) = self.ancestor(distance).map.get(&name) {
-            return Box::new(value);
+            return value.clone();
         } else {
             panic!("Variable Not Found!");
         }
     }
 
 
-    pub fn assignAt<T: 'static>(&mut self, name: String, value: T, distance : i32) where T:  Display {
+    pub fn assignAt<T: 'static>(&mut self, name: String, value: T, distance : i32) where T:  Encapsulation {
         let mut environment = &mut *self;
         for _i in 0..distance {
             match &mut *environment.enclosing{
                 Some(enclosing) => {
-                    environment = &mut *enclosing
+                    environment = enclosing
                 },
                 _ => {
                     panic!("Wrong Distance");
@@ -91,5 +120,4 @@ impl Environment {
         }
         environment.assign(name,value);
     }
-
 }
