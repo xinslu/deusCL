@@ -1,3 +1,4 @@
+use crate::environment::Encapsulation;
 use crate::environment::Values;
 use crate::{expression::Expression, types::TokenTypes, environment::Environment, visitors::Visitor};
 
@@ -9,7 +10,7 @@ use std::any::Any;
 
 pub struct Interpreter {
     environment: Environment,
-    locals: HashMap<String, i64>
+    locals: HashMap<String, Values>
 }
 impl Interpreter {
     pub fn new() -> Interpreter {
@@ -58,44 +59,44 @@ impl Interpreter {
         }
     }
 
-    pub fn process(&mut self, expression: Expression ) -> Box<dyn Display + 'static> {
+    pub fn process(&mut self, expression: Expression ) -> Option<Values> {
         match expression {
             Expression::Logical {operator: _, expr: _} => {
-                Box::new(self.visit_logical(expression))
+                Some(self.visit_logical(expression).return_value())
             },
             Expression::Arithmetic { operator: _, expr: _ } => {
-                Box::new(self.visit_arithmetic(expression))
+                Some(self.visit_arithmetic(expression).return_value())
             },
             Expression::Local {declarations: _, body: _} => {
                 self.visit_local(expression);
-                Box::new("")
+                None
             },
             Expression::Set {declarations: _} => {
                 self.visit_set(expression);
-                Box::new("")
+                None
             },
             Expression::Print { print: _ } => {
                 self.visit_print(expression);
-                Box::new("")
+                None
             },
             Expression::Variable { name: _ } => {
-                Box::new(self.visit_literal(&expression))
+                Some(self.visit_literal(&expression))
             },
             Expression::Literal { ref token} => {
                 if let TokenTypes::STRINGLITERAL = token._type {
-                    Box::new(self.visit_string(expression))
+                    Some(self.visit_string(expression).return_value())
                 } else {
-                    Box::new(self.visit_literal(&expression))
+                    Some(self.visit_literal(&expression))
                 }
 
             },
             Expression::If {condition: _, body: _, then: _} => {
                 self.visit_if(expression);
-                Box::new("")
+                None
             },
             _ => {
                 println!("Unsupported Operation Right Now");
-                Box::new("")
+                None
             }
         }
     }
@@ -108,11 +109,11 @@ impl Interpreter {
         if expr.len() as i32 == 0 {
             panic!("Parsing Error!");
         }
-        let mut temp = self.visit_literal(&expr[0]);
+        let mut temp = self.visit_literal(&expr[0]).matchInteger();
         let mut rBool = true;
         for i in &expr[1..] {
-            rBool = rBool && func(temp, self.visit_literal(i));
-            temp = self.visit_literal(i);
+            rBool = rBool && func(temp, self.visit_literal(i).matchInteger());
+            temp = self.visit_literal(i).matchInteger();
             if rBool == false {
                 return false;
             }
@@ -143,9 +144,9 @@ impl Interpreter {
     }
 
     pub fn artihmetic_lambda(&self, expr: Vec<Expression>, func: &dyn Fn(i64, i64) -> i64) -> i64  {
-        let mut temp = self.visit_literal(&expr[0]);
+        let mut temp = self.visit_literal(&expr[0]).matchInteger();
         for i in &expr[1..] {
-            temp = func(temp, self.visit_literal(i));
+            temp = func(temp, self.visit_literal(i).matchInteger());
         }
         return temp;
     }
@@ -197,7 +198,7 @@ impl Visitor for Interpreter {
                                     if let TokenTypes::NIL = token._type {
                                         return true;
                                     } else {
-                                        let result = self.visit_literal(&expr[0]);
+                                        let result = self.visit_literal(&expr[0]).matchInteger();
                                         if result == 0 {
                                             return false;
                                         }
@@ -223,31 +224,23 @@ impl Visitor for Interpreter {
         }
     }
 
-    fn visit_literal(&self, lit: &Expression) -> i64 {
+    fn visit_literal(&self, lit: &Expression) -> Values {
         match &lit {
             Expression::Literal {token} => {
                 if let TokenTypes::Number = token._type {
-                    return token.lexeme.parse().unwrap();
+                    return Values::Int(token.lexeme.parse().unwrap());
                 } else {
                     panic!("Should Be a Number Only!");
                 }
             },
             Expression::Arithmetic { operator: _, expr: _ } => {
-                return self.visit_arithmetic(lit.clone());
+                return Values::Int(self.visit_arithmetic(lit.clone()));
             },
             Expression::Variable { name } => {
                 if let Some(value) = self.locals.get(&name.lexeme) {
-                    return *value;
+                    return value.clone();
                 }
-                match self.environment.get(name.lexeme.clone()) {
-                    Values::Int(int) => {return int},
-                    Values::Str(_) => {
-                        panic!("Not of Right type")
-                    }
-                    Values::Bool(_) => {
-                        panic!("Not of Right type")
-                    }
-                }
+               return self.environment.get(name.lexeme.clone())
             }
             _ => {
                 panic!("Not a Literal!");
@@ -349,7 +342,9 @@ impl Visitor for Interpreter {
     fn visit_print(&mut self, print: Expression) {
         match print {
             Expression::Print { print } => {
-                println!("{}", self.process(*print));
+                if let Some(value) = self.process(*print) {
+                    println!("{}", value);
+                }
             },
             _ => {
                 panic!("Illegal Operation");
@@ -401,10 +396,10 @@ impl Visitor for Interpreter {
             Expression::Loop {variable, start, end, body} => {
                 match *variable {
                     Expression::Variable {name} => {
-                        let startInt = self.visit_literal(&*start);
-                        let endInt = self.visit_literal(&*end);
+                        let startInt = self.visit_literal(&*start).matchInteger();
+                        let endInt = self.visit_literal(&*end).matchInteger();
                         for i in startInt..endInt {
-                            self.locals.insert(name.lexeme.clone(), i);
+                            self.locals.insert(name.lexeme.clone(), Values::Int(i));
                             for j in &body {
                                 self.process(j.clone());
                             }
@@ -422,8 +417,7 @@ impl Visitor for Interpreter {
             if let Expression::Variable { name } = *name {
                 let value = self.visit_literal(&*expr);
                 let nameVar = name.lexeme.clone();
-                self.environment.define(nameVar, value);
-                self.locals.insert(name.lexeme, value);
+                self.environment.define(nameVar, value.clone());
             }
         } else {
             panic!("Not a GLobal Variable declarations");

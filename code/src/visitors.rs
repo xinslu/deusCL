@@ -1,11 +1,9 @@
-use crate::expression::{
-    Expression
-};
+use crate::{expression::Expression, environment::Values};
 
 
 pub trait Visitor {
     fn visit_logical(&mut self, log: Expression) -> bool;
-    fn visit_literal(&self, lit: &Expression) -> i64;
+    fn visit_literal(&self, lit: &Expression) -> Values;
     fn visit_arithmetic(&self, log: Expression) -> i64;
     fn visit_local(&mut self, loc: Expression);
     fn visit_set(&mut self, set: Expression);

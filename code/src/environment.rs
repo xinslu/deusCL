@@ -1,14 +1,14 @@
 use std::collections::HashMap;
-use std::fmt::Display;
+use std::fmt;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Values {
     Int(i64),
     Str(String),
     Bool(bool)
 }
 
-trait Encapsulation {
+pub trait Encapsulation {
     fn return_value(&self) -> Values;
 }
 
@@ -32,6 +32,38 @@ impl Encapsulation for bool {
 }
 
 
+impl Values {
+    pub fn matchInteger(&self) -> i64 {
+        match self {
+            Values::Int(integer) => {
+                return *integer;
+            },
+            _ => {
+                panic!("Wrong Type Excepted Integer");
+            }
+        }
+    }
+}
+
+
+
+impl fmt::Display for Values {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Values::Int(integer) => {
+                write!(f, "{}", integer)
+            },
+            Values::Str(string) => {
+                write!(f, "{}", string)
+            },
+            Values::Bool(boolean) => {
+                write!(f, "{}", boolean)
+            }
+        }
+
+    }
+}
+
 pub use crate::token:: Token;
 pub struct Environment {
     map: HashMap<String, Values>,
@@ -46,8 +78,8 @@ impl Environment {
         }
     }
 
-    pub fn define<T: 'static>(&mut self, name: String, value: T) where T:  Encapsulation {
-        self.map.insert(name, value.return_value() );
+    pub fn define(&mut self, name: String, value: Values) {
+        self.map.insert(name, value);
     }
 
 
