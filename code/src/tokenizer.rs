@@ -52,6 +52,7 @@ impl Tokenizer{
                 "(" => self.tokens.push(Token {_type: TokenTypes::LeftParen, lexeme: text}),
                 ")" => self.tokens.push(Token {_type: TokenTypes::RightParen, lexeme: text}),
                 "%" => self.tokens.push(Token {_type: TokenTypes::MOD, lexeme: text}),
+                "^+" => self.tokens.push(Token {_type: TokenTypes::CONCAT, lexeme: text}),
                 "max" => self.tokens.push(Token {_type: TokenTypes::MAX, lexeme: text}),
                 "min" => self.tokens.push(Token {_type: TokenTypes::MIN, lexeme: text}),
                 "and" => self.tokens.push(Token {_type: TokenTypes::AND, lexeme: text}),

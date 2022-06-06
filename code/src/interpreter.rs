@@ -111,6 +111,12 @@ impl Interpreter {
                 }
                 Ok(None)
             },
+            Expression::Loop {..} => {
+                if let Err(error) = self.visit_for(expression) {
+                    return Err(error);
+                }
+                Ok(None)
+            },
             _ => {
                Err(Error::Reason(format!("{:?} Unsupported Operation Right Now", expression)))
             }
@@ -249,15 +255,13 @@ impl Visitor for Interpreter {
             Expression::Literal {token} => {
                 if let TokenTypes::Number = token._type {
                     return Ok(Values::Int(token.lexeme.parse().unwrap()));
+                } else if let TokenTypes::STRINGLITERAL = token._type {
+                    return Ok(Values::Str(token.lexeme.parse().unwrap()));
                 }
-                Err(Error::Reason(format!("Should Be a Number Only. But was of type {}", token)))
+                Err(Error::Reason(format!("Unsupported Assignment to {}", token)))
             },
             Expression::Arithmetic { operator: _, expr: _ } => {
-                if let Ok(value) = self.visit_arithmetic(lit.clone()) {
-                    return Ok(Values::Int(value));
-                }
-                Err(Error::Reason("Error Processing Arithmetic Operation".to_string()))
-
+                return Ok(Values::Int(self.visit_arithmetic(lit.clone())?));
             },
             Expression::Variable { name } => {
                 if let Some(value) = self.locals.get(&name.lexeme) {

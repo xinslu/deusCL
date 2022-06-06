@@ -18,7 +18,7 @@ impl std::fmt::Debug for Token {
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} of type {:?}", self._type, self.lexeme)
+        write!(f, "{} of type {}", self.lexeme, self._type)
 
     }
 }

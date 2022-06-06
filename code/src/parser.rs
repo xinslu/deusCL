@@ -93,11 +93,19 @@ impl Parser{
             },
             TokenTypes::VAR => {
                 return Ok(self.var_declaration()?)
+            },
+            TokenTypes::Number => {
+                return Ok(self.return_num()?)
             }
             _ => {
-                Err(Error::Reason(format!("Invalid Operator: {}", self.peek())))
+                Err(Error::Reason(format!("Invalid Operator {}", self.peek())))
             }
         }
+    }
+
+    pub fn return_num(&mut self) -> Result<Expression, Error> {
+        self.current+=1;
+        Ok(Expression::Literal {token: self.peek_before ().clone()})
     }
 
     pub fn return_logical(&mut self) -> Result<Expression,Error> {
@@ -235,6 +243,7 @@ impl Parser{
         } else if self.r#match(TokenTypes::IDENTIFIER) {
             self.current-=1;
             expr = Box::new(self.equality()?);
+            self.current += 1
         } else {
             expr = Box::new(Expression::Literal {token: self.peek().clone()});
             self.current+=1;
@@ -264,7 +273,7 @@ impl Parser{
 
     pub fn variable(&mut self) -> Expression {
         let ret = Expression::Variable {name: self.peek().clone()};
-        self.current+=2;
+        self.current+=1;
         return ret;
     }
 
@@ -275,7 +284,7 @@ impl Parser{
         self.matchPanic(TokenTypes::LeftParen)?;
         let name : Box<Expression> = Box::new(Expression::Variable {name: self.matchPanic(TokenTypes::IDENTIFIER)?});
         let start : Box<Expression> =  Box::new(Expression::Literal {token: self.matchPanic(TokenTypes::Number)?});
-        let end : Box<Expression> =  Box::new(Expression::Literal {token: self.matchPanic(TokenTypes::Number)?});
+        let end : Box<Expression> =  Box::new(self.equality()?);
         self.matchPanic(TokenTypes::RightParen)?;
         loop {
             if self.r#match(TokenTypes::RightParen) || self.r#match(TokenTypes::LeftParen) { }
@@ -287,7 +296,6 @@ impl Parser{
                 // println!("{:?}", loopVec);
                 self.current += 1;
             }
-
         }
         Ok(Expression::Loop {
             variable: name,
@@ -335,7 +343,7 @@ impl Parser{
 
     pub fn matchPanic(&mut self, expected: TokenTypes) -> Result<Token,Error> {
         if self.is_at_end() || self.check(expected) == false {
-            return Err(Error::Reason("ERROR: Excepted a different Type of Token".to_string()))
+            return Err(Error::Reason(format!("Excepted a {}. Got a {}", expected, self.peek()._type)))
         }
         self.current += 1;
         return Ok(self.peek_before().clone());

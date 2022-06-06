@@ -39,16 +39,27 @@ pub enum TokenTypes {
     PRINT,
     IF,
     LOOP,
-    VAR
+    VAR,
+    CONCAT
 }
 
-#[derive(Debug)]
 pub enum Error {
     Reason(String)
 }
 
 
 impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::Reason(string) => {
+                write!(f, "ERROR: {}", string)
+            }
+        }
+
+    }
+}
+
+impl fmt::Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::Reason(string) => {
