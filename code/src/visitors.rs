@@ -12,4 +12,6 @@ pub trait Visitor {
     fn visit_string(&mut self, string: Expression) -> Result<String, Error>;
     fn visit_for(&mut self, loopExpr: Expression) -> Result<(), Error >;
     fn visit_global(&mut self, global: Expression)-> Result<(), Error >;
+    fn visit_block(&mut self, global: Expression) -> Result<(), Error>;
+    fn visit_string_man(&mut self, strings: Expression) -> Result<String, Error>;
 }

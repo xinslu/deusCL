@@ -96,11 +96,48 @@ impl Parser{
             },
             TokenTypes::Number => {
                 return Ok(self.return_num()?)
+            },
+            TokenTypes::LeftParen => {
+                return Ok(self.block_declaration()?)
+            }
+            TokenTypes::CONCAT => {
+                return Ok(self.strings()?)
             }
             _ => {
                 Err(Error::Reason(format!("Invalid Operator {}", self.peek())))
             }
         }
+    }
+
+    pub fn strings(&mut self) ->Result<Expression, Error> {
+        let mut string_concat: Vec<Expression> = Vec::new();
+        let operator = self.token_list[self.current as usize].clone();
+        self.current+=1;
+        loop {
+            if self.r#match(TokenTypes::RightParen) || self.is_at_end() {
+                break;
+            }
+            if self.r#match(TokenTypes::LeftParen) {
+                string_concat.push(self.equality()?);
+            } else if self.r#match(TokenTypes::Number) || self.r#match(TokenTypes::STRINGLITERAL) {
+                string_concat.push(Expression::Literal {token: self.peek_before().clone()});
+            } else if self.r#match(TokenTypes::IDENTIFIER){
+                string_concat.push(Expression::Variable {name: self.peek_before().clone()});
+            }
+        }
+        Ok(Expression::StringMan {operator, expr: string_concat})
+    }
+
+    pub fn block_declaration(&mut self) -> Result<Expression, Error> {
+        let mut expressions = Vec::new();
+        self.matchPanic(TokenTypes::LeftParen)?;
+        loop {
+            if self.r#match(TokenTypes::RightParen) {
+                break;
+            }
+            expressions.push(self.equality()?);
+        }
+        Ok(Expression::Block {expressions: expressions})
     }
 
     pub fn return_num(&mut self) -> Result<Expression, Error> {

@@ -63,6 +63,14 @@ impl Interpreter {
             Expression::Global {..} => {
                 self.visit_global(expression)?;
                 Ok(())
+            },
+            Expression::Block {..} => {
+                self.visit_block(expression)?;
+                Ok(())
+            },
+            Expression::StringMan {..} => {
+                println!("{:?}", self.visit_string(expression)?);
+                Ok(())
             }
             _ => {
                 Err(Error::Reason(format!("{:?} Unsupported Operation Right Now", expression)))
@@ -117,6 +125,13 @@ impl Interpreter {
                 }
                 Ok(None)
             },
+            Expression::Block {..} => {
+                self.visit_block(expression)?;
+                Ok(None)
+            },
+            Expression::StringMan {..} => {
+                Ok(Some(self.visit_string_man(expression)?.return_value()))
+            }
             _ => {
                Err(Error::Reason(format!("{:?} Unsupported Operation Right Now", expression)))
             }
@@ -169,6 +184,15 @@ impl Interpreter {
         let mut temp = (self.visit_literal(&expr[0])?).matchInteger()?;
         for i in &expr[1..] {
             temp = func(temp, (self.visit_literal(i)?).matchInteger()?);
+        }
+        return Ok(temp);
+    }
+
+
+    pub fn string_lambda(&self, expr: Vec<Expression>, func: &dyn Fn(String, String) -> String) -> Result<String, Error>  {
+        let mut temp = (self.visit_literal(&expr[0])?).to_string();
+        for i in &expr[1..] {
+            temp = func(temp, (self.visit_literal(i)?).to_string());
         }
         return Ok(temp);
     }
@@ -467,6 +491,32 @@ impl Visitor for Interpreter {
             Err(Error::Reason("Not a Variable".to_string()))
         } else {
             Err(Error::Reason("Not a Global Variable Declaration".to_string()))
+        }
+    }
+    fn visit_block(&mut self, block: Expression) -> Result<(), Error> {
+        if let Expression::Block {expressions} = block {
+            for i in expressions {
+                self.process(i)?;
+            }
+            Ok(())
+        } else {
+            return Err(Error::Reason("Cannot Evaluate a Block".to_string()))
+        }
+    }
+
+    fn visit_string_man(&mut self, string: Expression) -> Result<String, Error> {
+        let add = |a: String,b: String| format!("{}{}",a, b);
+        if let Expression::StringMan {operator, expr } = string {
+            match operator._type {
+                TokenTypes::CONCAT => {
+                    return Ok(self.string_lambda(expr, &add)?);
+                },
+                _ => {
+                    return Err(Error::Reason("Unsupported String Operation".to_string()));
+                }
+            }
+        } else {
+            return Err(Error::Reason("Has to be a string operation".to_string()));
         }
     }
 }

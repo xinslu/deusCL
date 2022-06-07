@@ -35,13 +35,27 @@ impl Encapsulation for bool {
 
 impl Values {
     pub fn matchInteger(&self) -> Result<i64,Error> {
+        if let Values::Int(integer) = self {
+            return Ok(*integer);
+        } else {
+            Err(Error::Reason("Wrong Type Excepted Integer".to_string()))
+        }
+    }
+
+
+    pub fn matchString(&self) -> Result<String,Error> {
+        if let Values::Str(string) = self {
+            return Ok(string.clone());
+        } else {
+            Err(Error::Reason("Wrong Type Excepted String".to_string()))
+        }
+    }
+
+    pub fn to_string(&self) -> String {
         match self {
-            Values::Int(integer) => {
-                return Ok(*integer);
-            },
-            _ => {
-                Err(Error::Reason("Wrong Type Excepted Integer".to_string()))
-            }
+            Values::Int(integer) => return integer.to_string(),
+            Values::Str(string) => return string.to_string(),
+            Values::Bool(boolean) => return boolean.to_string()
         }
     }
 }

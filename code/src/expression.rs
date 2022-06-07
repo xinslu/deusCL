@@ -39,6 +39,11 @@ pub enum Expression {
         }, Global {
             name: Box<Expression>,
             expr: Box<Expression>
+        }, Block {
+            expressions: Vec<Expression>
+        }, StringMan {
+            operator: Token,
+            expr: Vec<Expression>
         }
 }
 

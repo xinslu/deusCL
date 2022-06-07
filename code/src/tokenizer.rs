@@ -59,12 +59,25 @@ impl Tokenizer{
                         self.tokens.push(Token {_type: TokenTypes::Number, lexeme: text});
                     } else if text.chars().nth(0).unwrap() == '\"' {
                         if let Some(value) = text.chars().last(){
-                            if value == '\"' {
-                                self.tokens.push(Token {_type: TokenTypes::STRINGLITERAL, lexeme: text});
+                            if value == '\"' && text.len() != 1 {
+                                let len = text.len();
+                                let slice = &text[1..(len-1)];
+                                self.tokens.push(Token {_type: TokenTypes::STRINGLITERAL, lexeme: slice.to_string()});
                             } else {
                                 self.current -= 1;
-                                let multiWordString = self.mutliWordString();
-                                self.tokens.push(Token {_type: TokenTypes::STRINGLITERAL, lexeme: multiWordString} );
+                                let _slice: &str = "";
+                                if self.peek() == "\"" {
+                                    self.current+=1;
+                                    let multiWordString = self.mutliWordString();
+                                    let len = multiWordString.len();
+                                    let _slice = &multiWordString[0..(len-1)];
+                                } else {
+                                    let multiWordString = self.mutliWordString();
+                                    let len = multiWordString.len();
+                                    let _slice = &multiWordString[1..(len-1)];
+                                }
+
+                                self.tokens.push(Token {_type: TokenTypes::STRINGLITERAL, lexeme: _slice.to_string()} );
                             }
                         }
                     } else if text.chars().all(char::is_alphanumeric) {
@@ -83,10 +96,11 @@ impl Tokenizer{
         let mut text : String;
         loop {
             text = self.advance().to_string();
+            println!("{:?}", text);
             if self.is_at_end() {
                 break;
             }
-            if text.clone().chars().nth(text.len()-1).unwrap() == '\"' {
+            if text.clone().chars().nth(text.len()-1).unwrap() == '\"'  {
                 string += &text;
                 break;
             }
