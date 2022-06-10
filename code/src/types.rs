@@ -40,7 +40,9 @@ pub enum TokenTypes {
     IF,
     LOOP,
     VAR,
-    CONCAT
+    CONCAT,
+    RETURN,
+    DEFUN
 }
 
 pub enum Error {

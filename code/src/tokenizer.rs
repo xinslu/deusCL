@@ -53,8 +53,9 @@ impl Tokenizer{
                 "print" => self.tokens.push(Token {_type: TokenTypes::PRINT, lexeme: text}),
                 "if" => self.tokens.push(Token {_type: TokenTypes::IF, lexeme: text}),
                 "loop" => self.tokens.push(Token {_type: TokenTypes::LOOP, lexeme: text}),
-                "var" => self.tokens.push(Token {_type: TokenTypes::VAR, lexeme: text}),
-                _ => {
+                "return" => self.tokens.push(Token {_type: TokenTypes::RETURN, lexeme: text}),
+                "defun" =>  self.tokens.push(Token {_type: TokenTypes::DEFUN, lexeme: text}),
+               _ => {
                     if Tokenizer::is_digit(text.to_string()) {
                         self.tokens.push(Token {_type: TokenTypes::Number, lexeme: text});
                     } else if text.chars().nth(0).unwrap() == '\"' {
