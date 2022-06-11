@@ -44,6 +44,8 @@ pub enum Expression {
         }, StringMan {
             operator: Token,
             expr: Vec<Expression>
+        }, Return {
+            result: Box<Expression>
         }
 }
 

@@ -71,6 +71,10 @@ impl Interpreter {
             Expression::StringMan {..} => {
                 println!("{:?}", self.visit_string(expression)?);
                 Ok(())
+            },
+            Expression::Return {..} => {
+                println!("{:?}", self.visit_return(expression)?);
+                Ok(())
             }
             _ => {
                 Err(Error::Reason(format!("{:?} Unsupported Operation Right Now", expression)))
@@ -131,6 +135,10 @@ impl Interpreter {
             },
             Expression::StringMan {..} => {
                 Ok(Some(self.visit_string_man(expression)?.return_value()))
+            },
+            Expression::Return {..} => {
+                self.visit_return(expression)?;
+                Ok(None)
             }
             _ => {
                Err(Error::Reason(format!("{:?} Unsupported Operation Right Now", expression)))
@@ -519,5 +527,19 @@ impl Visitor for Interpreter {
             return Err(Error::Reason("Has to be a string operation".to_string()));
         }
     }
+    fn visit_return(&mut self, ret: Expression) -> Result<(),Error> {
+        if let Expression::Return {result } = ret {
+        match self.process(*result)? {
+            Some(x) => {
+                return Err(Error::Return(x))
+            },
+            None => {
+                return Err(Error::Reason("Return cannot be empty".to_string()))
+            }
+        }
+    } else{
+        return Err(Error::Reason("Has to be a return operation".to_string()))
+    }
+}
 }
 

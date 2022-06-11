@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fmt;
 pub use crate::token:: Token;
+use crate::environment::Values;
 
 #[derive(Clone, Debug, Copy)]
 pub enum TokenFunction {
@@ -46,7 +47,8 @@ pub enum TokenTypes {
 }
 
 pub enum Error {
-    Reason(String)
+    Reason(String),
+    Return(Values)
 }
 
 
@@ -55,6 +57,9 @@ impl fmt::Display for Error {
         match self {
             Error::Reason(string) => {
                 write!(f, "ERROR: {}", string)
+            }
+            Error::Return(values) => {
+                write!(f, "{}", values)
             }
         }
 
@@ -66,6 +71,9 @@ impl fmt::Debug for Error {
         match self {
             Error::Reason(string) => {
                 write!(f, "ERROR: {}", string)
+            },
+            Error::Return(values)=> {
+                write!(f, "{}", values)
             }
         }
 

@@ -102,11 +102,22 @@ impl Parser{
             }
             TokenTypes::CONCAT => {
                 return Ok(self.strings()?)
+            },
+            TokenTypes::RETURN => {
+                return Ok(self.return_statements()?)
             }
             _ => {
                 Err(Error::Reason(format!("Invalid Operator {}", self.peek())))
             }
         }
+    }
+
+    pub fn return_statements(&mut self) -> Result<Expression, Error> {
+        self.current+=1;
+        self.matchPanic(TokenTypes::LeftParen)?;
+        Ok(Expression::Return {
+            result: Box::new(self.equality()?)
+        })
     }
 
     pub fn strings(&mut self) ->Result<Expression, Error> {
