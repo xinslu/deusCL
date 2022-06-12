@@ -43,7 +43,6 @@ cargo run
 
 ![Local Variables](./Images/variable.png "Local Variables in DeusCL")
 
-
 ## Setting a Variable after Creation, If Block and Printing in DeusCL
 
 ![Setting a Variable after Creation, If Block and Printing](./Images/setAndIf.png "Setting a Variable after Creation, If Block and Printing")
@@ -52,3 +51,7 @@ cargo run
 ## Loop in DeusCL
 
 ![For Loop](./Images/loop.png "Print evens from 0 to 10")
+
+## Defining Functions and Calling in DeusCL
+
+![Functions](./Images/functions.png "performs fizz buzz on 15, 3 and 5")

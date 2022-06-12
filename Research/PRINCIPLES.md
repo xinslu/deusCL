@@ -1,2 +1,0 @@
-# Hindley–Milner type system
-
