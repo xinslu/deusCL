@@ -59,8 +59,9 @@ impl Values {
             Values::Int(integer) => return integer.to_string(),
             Values::Str(string) => return string.to_string(),
             Values::Bool(boolean) => return boolean.to_string(),
-            _ => {
-                return "Cannot convert to string".to_string()
+            Values::Function(function) => {
+                let functionalDec = Function::new(function.clone()).unwrap();
+                functionalDec.to_string()
             }
         }
     }
@@ -177,5 +178,15 @@ impl Environment {
         }
         environment.assign(name,value)?;
         Ok(())
+    }
+}
+
+impl ToString for Environment {
+    fn to_string(&self) -> String {
+        let mut string = "".to_string();
+        for (key, value) in &self.map {
+            string += &(key.to_owned() + " => " + &value.to_string())
+        }
+        return string;
     }
 }

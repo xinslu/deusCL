@@ -9,7 +9,7 @@ use std::fmt::Display;
 use std::any::Any;
 
 pub struct Interpreter {
-    environment: Environment,
+    pub environment: Environment,
     locals: HashMap<String, Values>
 }
 impl Interpreter {
@@ -75,6 +75,10 @@ impl Interpreter {
             Expression::Return {..} => {
                 println!("{:?}", self.visit_return(expression)?);
                 Ok(())
+            },
+            Expression::Function {..} => {
+                self.visit_function_dec(expression)?;
+                Ok(())
             }
             _ => {
                 Err(Error::Reason(format!("{:?} Unsupported Operation Right Now", expression)))
@@ -139,7 +143,11 @@ impl Interpreter {
             Expression::Return {..} => {
                 self.visit_return(expression)?;
                 Ok(None)
-            }
+            },
+            Expression::Function {..} => {
+                self.visit_function_dec(expression)?;
+                Ok(None)
+            },
             _ => {
                Err(Error::Reason(format!("{:?} Unsupported Operation Right Now", expression)))
             }
@@ -529,17 +537,26 @@ impl Visitor for Interpreter {
     }
     fn visit_return(&mut self, ret: Expression) -> Result<(),Error> {
         if let Expression::Return {result } = ret {
-        match self.process(*result)? {
-            Some(x) => {
-                return Err(Error::Return(x))
-            },
-            None => {
-                return Err(Error::Reason("Return cannot be empty".to_string()))
+            match self.process(*result)? {
+                Some(x) => {
+                    return Err(Error::Return(x))
+                },
+                None => {
+                    return Err(Error::Reason("Return cannot be empty".to_string()))
+                }
             }
+        } else {
+            return Err(Error::Reason("Has to be a return operation".to_string()))
         }
-    } else{
-        return Err(Error::Reason("Has to be a return operation".to_string()))
     }
-}
+
+    fn visit_function_dec(&mut self, func: Expression) -> Result<(), Error> {
+        if let Expression::Function { ref name, ..} = func {
+            self.environment.define(name.to_string(), Values::Function(func));
+            Ok(())
+        } else {
+            return Err(Error::Reason("Invalid Functional Declaration".to_string()))
+        }
+    }
 }
 
