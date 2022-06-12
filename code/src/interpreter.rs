@@ -161,6 +161,29 @@ impl Interpreter {
         }
     }
 
+    pub fn evaluateFunction(&mut self, statements: Expression, environment: Environment) -> Result<Values, Error>{
+        let previous = self.environment.clone();
+        self.environment = environment;
+        match self.accept(statements.clone()) {
+                Err(error) => {
+                    match error {
+                        Error::Reason(x)=> {
+                            self.environment = previous;
+                            return Err(Error::Reason(x))
+                        }
+                        Error::Return(x) => {
+                            self.environment = previous;
+                            return Err(Error::Return(x))
+                        }
+                    }
+                },
+                _ => {
+                    self.environment = previous;
+                    Ok(Values::None)
+                }
+        }
+    }
+
     pub fn clean_env(&mut self) {
         self.locals = HashMap::new();
     }
@@ -577,7 +600,8 @@ impl Visitor for Interpreter {
                         None => return Err(Error::Reason(format!("Function Argument {:?} does not evaluate to a valid value", i)))
                     }
                 }
-                function.call(self.clone(), arguements )
+                let result = function.call(self.clone(), arguements )?;
+                return Ok(result)
             } else {
                 return Err(Error::Reason(format!("Invalid Call to function, expected {} arguements got {}", function.arity()?, parameters.len())))
             }

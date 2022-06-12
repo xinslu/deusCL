@@ -37,21 +37,7 @@ impl Function {
                     environment.define(name.lexeme.clone(), arg.clone())
                 }
             }
-            match intptr.accept(*body.clone()) {
-                Err(error) => {
-                    match error {
-                        Error::Reason(x)=> {
-                            return Err(Error::Reason(x))
-                        }
-                        Error::Return(x) => {
-                            return Ok(x)
-                        }
-                    }
-                },
-                _ => {
-                    Ok(Values::None)
-                }
-            }
+            intptr.evaluateFunction(*body.clone(), environment)
         } else {
             return Err(Error::Reason("Invalid Function Declaration".to_string()))
         }
