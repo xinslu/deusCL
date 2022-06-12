@@ -11,7 +11,6 @@ pub enum TokenFunction {
 
 #[derive(Clone, Debug, Copy)]
 pub enum TokenTypes {
-    Fun(TokenFunction),
     Number,
     IDENTIFIER,
     LeftParen,
@@ -43,7 +42,8 @@ pub enum TokenTypes {
     VAR,
     CONCAT,
     RETURN,
-    DEFUN
+    DEFUN,
+    CALL
 }
 
 pub enum Error {

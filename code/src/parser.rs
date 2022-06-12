@@ -105,13 +105,35 @@ impl Parser{
             },
             TokenTypes::RETURN => {
                 return Ok(self.return_statements()?)
-            }, TokenTypes::DEFUN =>  {
+            },
+            TokenTypes::DEFUN =>  {
                 return Ok(self.functional_declaration()?)
+            },
+            TokenTypes::CALL => {
+                return Ok(self.call()?)
             }
             _ => {
                 Err(Error::Reason(format!("Invalid Operator {}", self.peek())))
             }
         }
+    }
+
+    pub fn call(&mut self) -> Result<Expression, Error> {
+        self.matchPanic(TokenTypes::CALL)?;
+        let name = self.matchPanic(TokenTypes::IDENTIFIER)?;
+        let mut parameters: Vec<Expression> = Vec::new();
+        loop {
+            if self.r#match(TokenTypes::RightParen) || self.is_at_end() {
+                break;
+            }
+            parameters.push(self.equality()?);
+        }
+        Ok(
+            Expression::Call {
+                name,
+                parameters
+            }
+        )
     }
 
     pub fn functional_declaration(&mut self) -> Result<Expression, Error> {
@@ -120,7 +142,7 @@ impl Parser{
         self.matchPanic(TokenTypes::LeftParen)?;
         let mut parameters: Vec<Expression> = Vec::new();
         loop {
-            if self.r#match(TokenTypes::RightParen) {
+            if self.r#match(TokenTypes::RightParen) || self.is_at_end() {
                 break;
             }
             parameters.push(self.equality()?)

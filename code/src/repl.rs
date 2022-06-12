@@ -27,7 +27,7 @@ pub fn repl() {
                 // println!("right after print");
                 match Parser::new(tokenizer.tokens).parse() {
                     Ok(parserresult) => {
-                        println!("{:?}", parserresult);
+                        // println!("{:?}", parserresult);
                         if let Err(error) = _interpreter.accept(parserresult.clone()) {
                             println!("{}", error);
                         }

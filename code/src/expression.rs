@@ -45,11 +45,14 @@ pub enum Expression {
             operator: Token,
             expr: Vec<Expression>
         }, Return {
-            result: Box<Expression>
+            result: Box<Expression,>
         }, Function {
             name: Token,
             parameters: Vec<Expression>,
             body: Box<Expression>
+        }, Call {
+            name: Token,
+            parameters: Vec<Expression>
         }
 }
 

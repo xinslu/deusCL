@@ -55,6 +55,7 @@ impl Tokenizer{
                 "loop" => self.tokens.push(Token {_type: TokenTypes::LOOP, lexeme: text}),
                 "return" => self.tokens.push(Token {_type: TokenTypes::RETURN, lexeme: text}),
                 "defun" =>  self.tokens.push(Token {_type: TokenTypes::DEFUN, lexeme: text}),
+                "call" => self.tokens.push(Token {_type: TokenTypes::CALL, lexeme: text}),
                _ => {
                     if Tokenizer::is_digit(text.to_string()) {
                         self.tokens.push(Token {_type: TokenTypes::Number, lexeme: text});
