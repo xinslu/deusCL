@@ -105,11 +105,32 @@ impl Parser{
             },
             TokenTypes::RETURN => {
                 return Ok(self.return_statements()?)
+            }, TokenTypes::DEFUN =>  {
+                return Ok(self.functional_declaration()?)
             }
             _ => {
                 Err(Error::Reason(format!("Invalid Operator {}", self.peek())))
             }
         }
+    }
+
+    pub fn functional_declaration(&mut self) -> Result<Expression, Error> {
+        self.matchPanic(TokenTypes::DEFUN)?;
+        let name = self.matchPanic(TokenTypes::IDENTIFIER)?;
+        self.matchPanic(TokenTypes::LeftParen)?;
+        let mut parameters: Vec<Expression> = Vec::new();
+        loop {
+            if self.r#match(TokenTypes::RightParen) {
+                break;
+            }
+            parameters.push(self.equality()?)
+        }
+        let body = self.equality()?;
+        Ok(Expression::Function {
+            name,
+            parameters,
+            body: Box::new(body)
+        })
     }
 
     pub fn return_statements(&mut self) -> Result<Expression, Error> {

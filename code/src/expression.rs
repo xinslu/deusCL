@@ -46,6 +46,10 @@ pub enum Expression {
             expr: Vec<Expression>
         }, Return {
             result: Box<Expression>
+        }, Function {
+            name: Token,
+            parameters: Vec<Expression>,
+            body: Box<Expression>
         }
 }
 

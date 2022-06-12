@@ -10,6 +10,7 @@ mod expression;
 mod visitors;
 mod interpreter;
 mod environment;
+mod functions;
 pub fn main() {
     repl::repl();
 }

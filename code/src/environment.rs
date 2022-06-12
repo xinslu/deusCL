@@ -1,12 +1,15 @@
 use std::collections::HashMap;
 use std::fmt;
 use crate::types::Error;
+use crate::expression::Expression;
+use crate::functions::Function;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum Values {
     Int(i64),
     Str(String),
-    Bool(bool)
+    Bool(bool),
+    Function(Expression)
 }
 
 pub trait Encapsulation {
@@ -55,7 +58,10 @@ impl Values {
         match self {
             Values::Int(integer) => return integer.to_string(),
             Values::Str(string) => return string.to_string(),
-            Values::Bool(boolean) => return boolean.to_string()
+            Values::Bool(boolean) => return boolean.to_string(),
+            _ => {
+                return "Cannot convert to string".to_string()
+            }
         }
     }
 }
@@ -73,6 +79,9 @@ impl fmt::Display for Values {
             },
             Values::Bool(boolean) => {
                 write!(f, "{}", boolean)
+            }
+            Values::Function(function) => {
+                write!(f, "{:?}", function)
             }
         }
 
