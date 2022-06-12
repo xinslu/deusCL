@@ -558,5 +558,7 @@ impl Visitor for Interpreter {
             return Err(Error::Reason("Invalid Functional Declaration".to_string()))
         }
     }
+
+    fn visit_call(&mut self, _: Expression) -> Result<(), Error> { todo!() }
 }
 

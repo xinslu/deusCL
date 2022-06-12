@@ -9,7 +9,8 @@ pub enum Values {
     Int(i64),
     Str(String),
     Bool(bool),
-    Function(Expression)
+    Function(Expression),
+    None
 }
 
 pub trait Encapsulation {
@@ -62,6 +63,9 @@ impl Values {
             Values::Function(function) => {
                 let functionalDec = Function::new(function.clone()).unwrap();
                 functionalDec.to_string()
+            },
+            Values::None => {
+                return "None".to_string()
             }
         }
     }
@@ -84,12 +88,16 @@ impl fmt::Display for Values {
             Values::Function(function) => {
                 write!(f, "{:?}", function)
             }
+            Values::None => {
+                write!(f, "None")
+            }
         }
 
     }
 }
 
 pub use crate::token:: Token;
+#[derive(Debug, Clone)]
 pub struct Environment {
     map: HashMap<String, Values>,
     enclosing: Box<Option<Environment>>
