@@ -6,7 +6,7 @@ use crate::environment::Environment;
 
 #[derive(Debug, Clone)]
 pub struct Function {
-    declaration: Expression
+    pub declaration: Expression
 }
 
 impl Function {

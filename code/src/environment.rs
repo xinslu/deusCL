@@ -36,6 +36,12 @@ impl Encapsulation for bool {
     }
 }
 
+impl Encapsulation for Function {
+    fn return_value(&self) -> Values {
+        return Values::Function(self.declaration.clone());
+     }
+}
+
 
 impl Values {
     pub fn matchInteger(&self) -> Result<i64,Error> {
@@ -52,6 +58,16 @@ impl Values {
             return Ok(string.clone());
         } else {
             Err(Error::Reason("Wrong Type Excepted String".to_string()))
+        }
+    }
+
+    pub fn matchFunction(&self) -> Result<Function, Error> {
+        if let Values::Function (function) = self {
+            return Ok(Function {
+                declaration: function.clone()
+            });
+        } else {
+            Err(Error::Reason("Wrong Type Excepted Function".to_string()))
         }
     }
 

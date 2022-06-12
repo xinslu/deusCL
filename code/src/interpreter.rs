@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::fmt::Display;
 
 use std::any::Any;
-
+#[derive(Debug, Clone)]
 pub struct Interpreter {
     pub environment: Environment,
     locals: HashMap<String, Values>
@@ -79,6 +79,10 @@ impl Interpreter {
             Expression::Function {..} => {
                 self.visit_function_dec(expression)?;
                 Ok(())
+            },
+            Expression::Call {..} => {
+                self.visit_call(expression)?;
+                Ok(())
             }
             _ => {
                 Err(Error::Reason(format!("{:?} Unsupported Operation Right Now", expression)))
@@ -148,6 +152,9 @@ impl Interpreter {
                 self.visit_function_dec(expression)?;
                 Ok(None)
             },
+            Expression::Call {..} => {
+               Ok(Some(self.visit_call(expression)?))
+            }
             _ => {
                Err(Error::Reason(format!("{:?} Unsupported Operation Right Now", expression)))
             }
@@ -559,6 +566,24 @@ impl Visitor for Interpreter {
         }
     }
 
-    fn visit_call(&mut self, _: Expression) -> Result<(), Error> { todo!() }
+    fn visit_call(&mut self, call: Expression) -> Result<Values, Error> {
+        if let Expression::Call {name, parameters} = call {
+            let mut function = self.environment.get(name.to_string())?.matchFunction()?;
+            if parameters.len() as i64 == function.arity()? {
+                let mut arguements = Vec::new();
+                for i in parameters {
+                    match self.process(i.clone())? {
+                        Some(x) => arguements.push(x),
+                        None => return Err(Error::Reason(format!("Function Argument {:?} does not evaluate to a valid value", i)))
+                    }
+                }
+                function.call(self.clone(), arguements )
+            } else {
+                return Err(Error::Reason(format!("Invalid Call to function, expected {} arguements got {}", function.arity()?, parameters.len())))
+            }
+        } else {
+            return Err(Error::Reason("Invalid Call to function".to_string()))
+        }
+    }
 }
 
