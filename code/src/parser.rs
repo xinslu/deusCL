@@ -354,7 +354,7 @@ impl Parser{
         if self.r#match(TokenTypes::LeftParen) {
             then = Some(Box::new(self.equality()?))
         }
-        self.current+=1;
+        self.current+=2;
         Ok(Expression::If {
             condition: Box::new(condition),
             body: Box::new(Body),
