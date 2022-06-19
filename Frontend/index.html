@@ -10,8 +10,34 @@
             font-family: Source Code Pro;
             background-color: black;
         }
+
+        h4 {
+            color: white;
+        }
+
+        input {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-family: Source Code Pro;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+        }
     </style>
+    <script type="module" src="index.js"></script>
 </head>
+
 <body>
-    <div id="root"></div>
+    <div id="root">
+        <form onsubmit="return run(event)">
+            <h4>DEUSCL-USER>
+                <input></input>
+                <input type="submit" style="display: none" />
+            </h4>
+        </form>
+        <h4 id="result"></h4>
+    </div>
 </body>
