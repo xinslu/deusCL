@@ -11,6 +11,7 @@ mod token;
 mod tokenizer;
 mod types;
 mod visitors;
+use environment::Environment;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub fn main(s: String) -> String {

@@ -12,7 +12,7 @@
         }
 
         h4 {
-            color: white;
+            color: green;
         }
 
         input {
@@ -21,10 +21,16 @@
             color: white;
             font-family: Source Code Pro;
             font-size: 15px;
+            width: 90%;
+            padding-left: 0.5%;
         }
 
         input:focus {
             outline: none;
+        }
+
+        h3 {
+            color: white;
         }
     </style>
     <script type="module" src="index.js"></script>
@@ -32,12 +38,12 @@
 
 <body>
     <div id="root">
-        <form onsubmit="return run(event)">
+        <form autocomplete="off" onsubmit="return run(event)">
             <h4>DEUSCL-USER>
-                <input></input>
+                <input id="code0"></input>
                 <input type="submit" style="display: none" />
             </h4>
         </form>
-        <h4 id="result"></h4>
+        <h3 id="result0"></h3>
     </div>
 </body>
