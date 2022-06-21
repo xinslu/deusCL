@@ -49,7 +49,7 @@ impl Interpreter {
                 Ok(())
             }
             Expression::Print { print: _ } => {
-                self.visit_print(expression);
+                self.visit_print(expression)?;
                 Ok(())
             }
             Expression::Literal { ref token } => {
@@ -484,6 +484,7 @@ impl Visitor for Interpreter {
         match print {
             Expression::Print { print } => {
                 if let Some(value) = self.process(*print)? {
+                    println!("{}", value);
                     Ok(value)
                 } else {
                     Err(Error::Reason("Cannot Read Value".to_string()))

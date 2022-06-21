@@ -4,11 +4,11 @@
 mod environment;
 mod expression;
 mod functions;
-mod interpreter;
-mod parser;
+pub mod interpreter;
+pub mod parser;
 pub mod repl;
 mod token;
-mod tokenizer;
+pub mod tokenizer;
 mod types;
 mod visitors;
 use environment::Environment;
