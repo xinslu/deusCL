@@ -12,12 +12,13 @@ pub fn main() {
         println!("No previous history.");
     }
     let mut counter = 0;
+    let mut lines = String::new();
+    let mut prompt = "DEUS-USER> ";
     loop {
-        let readline = rl.readline("DEUS-USER> ");
+        let readline = rl.readline(prompt);
         let mut tokenizer = Tokenizer::new();
         match readline {
             Ok(line) => {
-                println!("{}", counter);
                 for i in line.chars() {
                     if i == '(' {
                         counter += 1;
@@ -25,14 +26,15 @@ pub fn main() {
                         counter -= 1;
                     }
                 }
+                lines.push_str(&line.clone());
                 if counter == 0 {
-                    let processed_line = str::replace(line.as_str(), "\n", " ");
+                    let processed_line = str::replace(lines.as_str(), "\n", " ");
                     rl.add_history_entry(processed_line.clone());
                     if let Err(error) = tokenizer.tokenize(processed_line.to_string()) {
                         println!("{}", error);
                     } else {
                         // println!("created parser");
-                        tokenizer.print_tokens();
+                        // tokenizer.print_tokens();
                         // println!("right after print");
                         match Parser::new(tokenizer.tokens).parse() {
                             Ok(parserresult) => {
@@ -47,7 +49,16 @@ pub fn main() {
                             }
                         }
                     }
+                    lines = String::new();
                     counter = 0;
+                    prompt = "DEUS-USER> ";
+                } else if counter < 0 {
+                    lines = String::new();
+                    counter = 0;
+                    prompt = "DEUS-USER> ";
+                    println!("ERROR: Mismatched Closing Paranthesis")
+                } else {
+                    prompt = ".........> "
                 }
             }
             Err(ReadlineError::Interrupted) => {
