@@ -28,6 +28,13 @@ git clone https://github.com/xinslu/deusCL.git
 cd deusCL/frontend
 cargo run
 ```
+You can run the browser version (Experimental) of the repl using:
+```
+cd DeusCL
+python3 -m http.server
+```
+
+Then, navigating to `http://localhost:8000/Frontend/`
 
 # Images
 

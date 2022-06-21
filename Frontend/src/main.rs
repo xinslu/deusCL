@@ -26,7 +26,7 @@ pub fn main() {
                         counter -= 1;
                     }
                 }
-                lines.push_str(&line.clone());
+                lines.push_str(&str::replace(line.as_str(), "\n", " "));
                 if counter == 0 {
                     let processed_line = str::replace(lines.as_str(), "\n", " ");
                     rl.add_history_entry(processed_line.clone());
