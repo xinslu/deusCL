@@ -1,6 +1,6 @@
 /repl-backend/target
 **/.DS_Store
-/code/history.txt
+/repl-backend/history.txt
 /Frontend/history.txt
 /Frontend/target
 dist/
