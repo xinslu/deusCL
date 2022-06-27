@@ -1,0 +1,17 @@
+/Users/kinshukphalke/Documents/DeusCL/code/target/debug/deps/curl-791ed61290e47dae.rmeta: /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/lib.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/error.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/version.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/mod.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/form.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/handle.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/handler.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/list.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/windows.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/multi.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/panic.rs
+
+/Users/kinshukphalke/Documents/DeusCL/code/target/debug/deps/curl-791ed61290e47dae.d: /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/lib.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/error.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/version.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/mod.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/form.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/handle.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/handler.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/list.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/windows.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/multi.rs /Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/panic.rs
+
+/Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/lib.rs:
+/Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/error.rs:
+/Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/version.rs:
+/Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/mod.rs:
+/Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/form.rs:
+/Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/handle.rs:
+/Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/handler.rs:
+/Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/list.rs:
+/Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/easy/windows.rs:
+/Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/multi.rs:
+/Users/kinshukphalke/.cargo/registry/src/github.com-1ecc6299db9ec823/curl-0.4.43/src/panic.rs:
+
+# env-dep:CARGO_PKG_VERSION=0.4.43

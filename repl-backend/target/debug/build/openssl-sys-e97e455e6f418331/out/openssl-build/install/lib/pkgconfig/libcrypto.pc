@@ -1,0 +1,12 @@
+prefix=/Users/kinshukphalke/Documents/DeusCL/code/target/debug/build/openssl-sys-e97e455e6f418331/out/openssl-build/install
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+enginesdir=${libdir}/engines-1.1
+
+Name: OpenSSL-libcrypto
+Description: OpenSSL cryptography library
+Version: 1.1.1o
+Libs: -L${libdir} -lcrypto
+Libs.private:  
+Cflags: -I${includedir}
