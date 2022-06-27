@@ -1,5 +1,4 @@
 use yew::prelude::*;
-
 enum Msg {
     AddOne,
 }

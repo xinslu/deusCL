@@ -1,23 +1,9 @@
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(non_snake_case)]
-mod environment;
-mod expression;
-mod functions;
-pub mod interpreter;
-pub mod parser;
-pub mod repl;
-mod token;
-pub mod tokenizer;
-mod types;
-mod visitors;
-use parser::Parser;
-use environment::Environment;
+use code::interpreter::Interpreter;
+use code::parser::Parser;
+use code::tokenizer::Tokenizer;
 use log;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
-use interpreter::Interpreter;
-use tokenizer::Tokenizer;
 
 pub fn main() {
     let mut rl = Editor::<()>::new();
@@ -40,7 +26,7 @@ pub fn main() {
                         counter -= 1;
                     }
                 }
-                lines.push_str(&str::replace(line.as_str(), "\n", " "));
+                lines.push_str(&line.clone());
                 if counter == 0 {
                     let processed_line = str::replace(lines.as_str(), "\n", " ");
                     rl.add_history_entry(processed_line.clone());

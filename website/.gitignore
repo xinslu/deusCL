@@ -4,3 +4,8 @@
 /Frontend/history.txt
 /Frontend/target
 dist/
+
+
+# Added by cargo
+
+/target
