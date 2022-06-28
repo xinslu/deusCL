@@ -1,45 +1,38 @@
-use yew::prelude::*;
-enum Msg {
-    AddOne,
+use wasm_bindgen::JsCast;
+use yew::{function_component, html, FocusEvent};
+use web_sys::{EventTarget, HtmlFormElement};
+use log::info;
+
+#[function_component(LineInput)]
+fn form_prompt() -> Html {
+    let onsubmit = |event: FocusEvent| {
+        event.prevent_default();
+        let target: Option<EventTarget> = event.target();
+        let input = target.and_then(|t| t.dyn_into::<HtmlFormElement>().ok());
+        if let Some(some_value) = input {
+            info!("{:?}", some_value.target());
+        }
+    };
+    html! {
+        <>
+        <form autocomplete="off" onsubmit={onsubmit}>
+            <h4>{"DEUSCL-USER> "}
+                <input id="code0" />
+                <input type="submit" style="display: none" />
+            </h4>
+        </form>
+        <h3 id="result0"></h3>
+        </>
+    }
 }
 
-struct Model {
-    value: i64,
-}
-
-impl Component for Model {
-    type Message = Msg;
-    type Properties = ();
-
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self {
-            value: 0,
-        }
-    }
-
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        match msg {
-            Msg::AddOne => {
-                self.value += 1;
-                // the value has changed so we need to
-                // re-render for it to appear on the page
-                true
-            }
-        }
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        // This gives us a component's "`Scope`" which allows us to send messages, etc to the component.
-        let link = ctx.link();
-        html! {
-            <div>
-                <button onclick={link.callback(|_| Msg::AddOne)}>{ "+1" }</button>
-                <p>{ self.value }</p>
-            </div>
-        }
-    }
+// Then somewhere else you can use the component inside `html!`
+#[function_component(App)]
+fn app() -> Html {
+    html! { <LineInput /> }
 }
 
 fn main() {
-    yew::start_app::<Model>();
+    wasm_logger::init(wasm_logger::Config::default());
+    yew::start_app::<App>();
 }
