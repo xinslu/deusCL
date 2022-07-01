@@ -1,38 +1,64 @@
-use wasm_bindgen::JsCast;
-use yew::{function_component, html, FocusEvent};
-use web_sys::{EventTarget, HtmlFormElement};
-use log::info;
+use yew::TargetCast;
+use yew::{events::KeyboardEvent, html, Component, Context, Html};
+use web_sys;
+use weblog::{console_log};
 
-#[function_component(LineInput)]
-fn form_prompt() -> Html {
-    let onsubmit = |event: FocusEvent| {
-        event.prevent_default();
-        let target: Option<EventTarget> = event.target();
-        let input = target.and_then(|t| t.dyn_into::<HtmlFormElement>().ok());
-        if let Some(some_value) = input {
-            info!("{:?}", some_value.target());
+enum Msg {
+    Submit,
+    OnInput(String)
+}
+
+struct Input {
+    line: i32,
+    code: String
+}
+
+impl Component for Input {
+
+    type Message = Msg;
+    type Properties = ();
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self { line: 0 , code: "".to_string()}
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            Msg::Submit => {
+               console_log!("Hello world!", self.line, self.code.clone());
+                true
+            },
+            Msg::OnInput(value) => {
+                self.code = value;
+                true
+            }
+        };
+        true
+    }
+
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let onkeypress = ctx.link().batch_callback(|event: KeyboardEvent| {
+            if event.key() == "Enter" {
+                Some(Msg::Submit)
+            } else {
+                None
+            }
+        });
+
+        html! {
+            <>
+                <h4> {"DEUS-USER>  "}
+                    <input type="text" {onkeypress} oninput={ ctx.link().callback(|e: web_sys::InputEvent| {
+                    let input: web_sys::HtmlInputElement = e.target_unchecked_into();
+                    Msg::OnInput( input.value() ) })} />
+                </h4>
+            </>
         }
-    };
-    html! {
-        <>
-        <form autocomplete="off" onsubmit={onsubmit}>
-            <h4>{"DEUSCL-USER> "}
-                <input id="code0" />
-                <input type="submit" style="display: none" />
-            </h4>
-        </form>
-        <h3 id="result0"></h3>
-        </>
     }
 }
 
-// Then somewhere else you can use the component inside `html!`
-#[function_component(App)]
-fn app() -> Html {
-    html! { <LineInput /> }
-}
 
 fn main() {
-    wasm_logger::init(wasm_logger::Config::default());
-    yew::start_app::<App>();
+    yew::start_app::<Input>();
 }
