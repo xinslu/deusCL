@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 "code" = { path = "repl-backend/" }
-yew = "0.19"
+yew = "0.19.3"
 wasm-logger = "0.2.0"
 log = "0.4.6"
 wasm-bindgen = "0.2.81"

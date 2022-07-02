@@ -2,8 +2,7 @@ use crate::interpreter::Interpreter;
 use crate::parser::Parser;
 use crate::tokenizer::Tokenizer;
 use std::io::{stdin, stdout, Write};
-pub fn repl(s: String) -> String {
-    let mut _interpreter = Interpreter::new();
+pub fn repl(s: String, interpreter: &mut Interpreter) -> String {
     let mut tokenizer = Tokenizer::new();
     let processed_line = str::replace(s.as_str(), "\n", " ");
     if let Err(error) = tokenizer.tokenize(processed_line.to_string()) {
@@ -15,7 +14,7 @@ pub fn repl(s: String) -> String {
         match Parser::new(tokenizer.tokens).parse() {
             Ok(parserresult) => {
                 // println!("{:?}", parserresult);
-                match _interpreter.process(parserresult.clone()) {
+                match interpreter.process(parserresult.clone()) {
                     Ok(optional) => match optional {
                         Some(result) => return format!("{}", result),
                         None => {
@@ -28,7 +27,7 @@ pub fn repl(s: String) -> String {
                 }
             }
             Err(error) => {
-                format!("{:?}", error)
+                format!("{}", error)
             }
         }
     }
