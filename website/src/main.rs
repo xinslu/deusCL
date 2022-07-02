@@ -6,14 +6,14 @@ use code::repl;
 use yew::prelude::*;
 
 
-enum Msg {
+pub enum Msg {
     Submit,
     OnInput(String)
 }
 
 
 #[derive(PartialEq, Default, Debug, Clone)]
-struct Input {
+pub struct Input {
     line: i32,
     code: String,
     result: String
@@ -86,16 +86,27 @@ impl Component for Repl {
     type Properties = ListProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self { lines: Vec::new()}
+        let mut lines = Vec::new();
+        lines.push(Input { line: 0 , code: "".to_string(), result: "".to_string()});
+        Self { lines: lines}
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            PMsg::AddLine => {
+                self.lines.push(Input { line: 0 , code: "".to_string(), result: "".to_string()})
+            },
+        };
+        true
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        // This gives us a component's "`Scope`" which allows us to send messages, etc to the component.
-        let link = ctx.link();
         html! {
             <div>
-                 {for self.lines.clone().into_iter().map(|line| {
-                    line.view()
+                 {for self.lines.clone().into_iter().map(|_line| {
+                    html! {
+                        <Input />
+                    }
                  })}
             </div>
         }
@@ -106,5 +117,5 @@ impl Component for Repl {
 
 
 fn main() {
-    yew::start_app::<Input>();
+    yew::start_app::<Repl>();
 }
